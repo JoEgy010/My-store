@@ -1,5 +1,5 @@
-// بيانات المنتجات
-const products = [
+// بيانات المنتجات - المصفوفة الافتراضية
+let products = [
     {
         id: 1,
         title: "تيشيرت قطني بأكمام قصيرة",
@@ -107,6 +107,13 @@ let currentFilter = 'all';
 
 // تحميل الصفحة
 document.addEventListener('DOMContentLoaded', function() {
+    // تحميل المنتجات من localStorage إذا كانت موجودة
+    const savedProducts = localStorage.getItem('products');
+    if (savedProducts) {
+        // استبدال المنتجات الافتراضية بالمنتجات المحفوظة
+        products = JSON.parse(savedProducts);
+    }
+    
     // عرض المنتجات
     displayProducts();
     
