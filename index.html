@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ستايل شوب - متجر الملابس الشبابية</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>ستايل شوب</h1>
+                <p>قطع مختارة بعناية</p>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#" class="active">الرئيسية</a></li>
+                    <li><a href="#categories">الأقسام</a></li>
+                    <li><a href="#featured">منتجات مميزة</a></li>
+                    <li><a href="#about">من نحن</a></li>
+                </ul>
+            </nav>
+            <div class="cart">
+                <a href="#" id="cart-icon"><i class="fas fa-shopping-cart"></i> <span id="cart-count">0</span></a>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2>قطع مختارة بعناية لإطلالة مميزة</h2>
+                <p>نقدم لك أفضل الملابس الشبابية والكاجوال بتصاميم عصرية وجودة عالية</p>
+                <a href="#categories" class="btn">تسوق الآن</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم الأقسام -->
+    <section id="categories" class="categories">
+        <div class="container">
+            <h2 class="section-title">أقسام المتجر</h2>
+            <div class="category-grid">
+                <div class="category-card" data-category="tshirts">
+                    <img src="https://images.unsplash.com/photo-1576566588028-4147f3842f27?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="تيشيرتات شبابية">
+                    <h3>تيشيرتات شبابية</h3>
+                    <a href="#" class="btn-small" onclick="filterProducts('tshirts')">عرض المنتجات</a>
+                </div>
+                <div class="category-card" data-category="pants">
+                    <img src="https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="بناطيل جينز وكاجوال">
+                    <h3>بناطيل جينز وكاجوال</h3>
+                    <a href="#" class="btn-small" onclick="filterProducts('pants')">عرض المنتجات</a>
+                </div>
+                <div class="category-card" data-category="shoes">
+                    <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="أحذية رياضية وكاجوال">
+                    <h3>أحذية رياضية وكاجوال</h3>
+                    <a href="#" class="btn-small" onclick="filterProducts('shoes')">عرض المنتجات</a>
+                </div>
+                <div class="category-card" data-category="accessories">
+                    <img src="https://images.unsplash.com/photo-1556306535-0f09a537f0a3?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="إكسسوارات">
+                    <h3>إكسسوارات</h3>
+                    <a href="#" class="btn-small" onclick="filterProducts('accessories')">عرض المنتجات</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم المنتجات المميزة -->
+    <section id="featured" class="products">
+        <div class="container">
+            <h2 class="section-title">منتجات مميزة</h2>
+            <div class="filter-buttons">
+                <button class="filter-btn active" onclick="filterProducts('all')">الكل</button>
+                <button class="filter-btn" onclick="filterProducts('tshirts')">تيشيرتات</button>
+                <button class="filter-btn" onclick="filterProducts('pants')">بناطيل</button>
+                <button class="filter-btn" onclick="filterProducts('shoes')">أحذية</button>
+                <button class="filter-btn" onclick="filterProducts('accessories')">إكسسوارات</button>
+            </div>
+            <div class="product-grid" id="product-grid">
+                <!-- سيتم إضافة المنتجات هنا بواسطة JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم من نحن -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2 class="section-title">من نحن</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>نحن متجر متخصص في بيع قطع مختارة من الملابس والأحذية الشبابية والكاجوال. نركز على اختيار منتجات ذات جودة عالية وتصاميم عصرية تناسب الشباب.</p>
+                    <p>نؤمن بأن الأناقة تكمن في البساطة والجودة، لذلك نختار منتجاتنا بعناية فائقة لنقدم لكم تجربة تسوق مميزة.</p>
+                    <div class="features">
+                        <div class="feature">
+                            <i class="fas fa-truck"></i>
+                            <h3>توصيل سريع</h3>
+                            <p>نوصل طلبك خلال 2-3 أيام عمل</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-undo"></i>
+                            <h3>استبدال سهل</h3>
+                            <p>يمكنك استبدال المنتج خلال 14 يوم</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-headset"></i>
+                            <h3>دعم متواصل</h3>
+                            <p>فريق خدمة العملاء متاح للمساعدة</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-image">
+                    <img src="https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="متجرنا">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- سلة التسوق -->
+    <div id="cart-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>سلة التسوق</h2>
+            <div id="cart-items">
+                <!-- سيتم إضافة عناصر السلة هنا بواسطة JavaScript -->
+            </div>
+            <div class="cart-total">
+                <p>المجموع: <span id="cart-total">0</span> جنيه مصري</p>
+            </div>
+            <button id="checkout-btn" class="btn">إتمام الشراء</button>
+        </div>
+    </div>
+
+    <!-- تفاصيل المنتج -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content product-modal-content">
+            <span class="close">&times;</span>
+            <div id="product-details">
+                <!-- سيتم إضافة تفاصيل المنتج هنا بواسطة JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- تذييل الصفحة -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>ستايل شوب</h2>
+                    <p>قطع مختارة بعناية</p>
+                </div>
+                <div class="footer-links">
+                    <h3>روابط سريعة</h3>
+                    <ul>
+                        <li><a href="#">الرئيسية</a></li>
+                        <li><a href="#categories">الأقسام</a></li>
+                        <li><a href="#featured">منتجات مميزة</a></li>
+                        <li><a href="#about">من نحن</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h3>تواصل معنا</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> الرياض، المملكة العربية السعودية</p>
+                    <p><i class="fas fa-phone"></i> +966 12 345 6789</p>
+                    <p><i class="fas fa-envelope"></i> info@styleshop.com</p>
+                </div>
+                <div class="footer-social">
+                    <h3>تابعنا</h3>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-snapchat"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 ستايل شوب. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

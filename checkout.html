@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إتمام الشراء - ستايل شوب</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- رأس الصفحة -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>ستايل شوب</h1>
+                <p>قطع مختارة بعناية</p>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">الرئيسية</a></li>
+                    <li><a href="index.html#categories">الأقسام</a></li>
+                    <li><a href="index.html#featured">منتجات مميزة</a></li>
+                    <li><a href="index.html#about">من نحن</a></li>
+                </ul>
+            </nav>
+            <div class="cart">
+                <a href="#" id="cart-icon"><i class="fas fa-shopping-cart"></i> <span id="cart-count">0</span></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- قسم إتمام الشراء -->
+    <section class="checkout-section">
+        <div class="container">
+            <h2 class="section-title">إتمام الشراء</h2>
+            
+            <div class="checkout-container">
+                <!-- معلومات الطلب -->
+                <div class="checkout-order-summary">
+                    <h3>ملخص الطلب</h3>
+                    <div id="checkout-items">
+                        <!-- سيتم إضافة المنتجات هنا بواسطة JavaScript -->
+                    </div>
+                    <div class="checkout-total">
+                        <p>المجموع: <span id="checkout-total">0</span> جنيه مصري</p>
+                    </div>
+                </div>
+                
+                <!-- نموذج بيانات العميل -->
+                <div class="checkout-form-container">
+                    <h3>بيانات الشحن</h3>
+                    <form id="checkout-form">
+                        <div class="form-group">
+                            <label for="fullname">الاسم الثلاثي <span class="required">*</span></label>
+                            <input type="text" id="fullname" name="fullname" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone1">رقم الهاتف الأول <span class="required">*</span></label>
+                            <input type="tel" id="phone1" name="phone1" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone2">رقم الهاتف الثاني</label>
+                            <input type="tel" id="phone2" name="phone2">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="governorate">المحافظة <span class="required">*</span></label>
+                            <select id="governorate" name="governorate" required>
+                                <option value="">اختر المحافظة</option>
+                                <option value="القاهرة">القاهرة</option>
+                                <option value="الإسكندرية">الإسكندرية</option>
+                                <option value="الجيزة">الجيزة</option>
+                                <option value="المنصورة">المنصورة</option>
+                                <option value="أسيوط">أسيوط</option>
+                                <option value="طنطا">طنطا</option>
+                                <option value="الإسماعيلية">الإسماعيلية</option>
+                                <option value="بورسعيد">بورسعيد</option>
+                                <option value="السويس">السويس</option>
+                                <option value="الأقصر">الأقصر</option>
+                                <option value="أسوان">أسوان</option>
+                                <option value="المنيا">المنيا</option>
+                                <option value="سوهاج">سوهاج</option>
+                                <option value="الفيوم">الفيوم</option>
+                                <option value="قنا">قنا</option>
+                                <option value="بني سويف">بني سويف</option>
+                                <option value="الشرقية">الشرقية</option>
+                                <option value="الغربية">الغربية</option>
+                                <option value="البحيرة">البحيرة</option>
+                                <option value="دمياط">دمياط</option>
+                                <option value="كفر الشيخ">كفر الشيخ</option>
+                                <option value="الدقهلية">الدقهلية</option>
+                                <option value="القليوبية">القليوبية</option>
+                                <option value="المنوفية">المنوفية</option>
+                                <option value="البحر الأحمر">البحر الأحمر</option>
+                                <option value="مطروح">مطروح</option>
+                                <option value="شمال سيناء">شمال سيناء</option>
+                                <option value="جنوب سيناء">جنوب سيناء</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="city">المدينة <span class="required">*</span></label>
+                            <input type="text" id="city" name="city" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="address">العنوان بالتفصيل <span class="required">*</span></label>
+                            <textarea id="address" name="address" rows="3" required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="house_number">رقم المنزل <span class="required">*</span></label>
+                            <input type="text" id="house_number" name="house_number" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="apartment_number">رقم الشقة (اختياري)</label>
+                            <input type="text" id="apartment_number" name="apartment_number">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="notes">ملاحظات</label>
+                            <textarea id="notes" name="notes" rows="3"></textarea>
+                        </div>
+                        
+                        <!-- قسم إدارة أكواد المنتجات (مخفي) -->
+                        <div class="admin-section" style="display: none;">
+                            <h4>إدارة أكواد المنتجات</h4>
+                            <p>يتم إنشاء كود فريد لكل منتج يظهر فقط في رسائل بوت التليجرام عند إتمام الطلب.</p>
+                            <p>لتغيير هذه الأكواد، يرجى تعديل ملف <code>product-codes.js</code> وتغيير القيم في كائن <code>productCodes</code>.</p>
+                            <div class="code-example">
+                                <pre>// مثال على تنسيق الأكواد
+const productCodes = {
+    1: "TS001-XYZ",  // كود للمنتج رقم 1
+    2: "JP002-XYZ",  // كود للمنتج رقم 2
+    // ... وهكذا
+};</pre>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn submit-order">إرسال الطلب</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- تذييل الصفحة -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>ستايل شوب</h2>
+                    <p>قطع مختارة بعناية</p>
+                </div>
+                <div class="footer-links">
+                    <h3>روابط سريعة</h3>
+                    <ul>
+                        <li><a href="index.html">الرئيسية</a></li>
+                        <li><a href="index.html#categories">الأقسام</a></li>
+                        <li><a href="index.html#featured">منتجات مميزة</a></li>
+                        <li><a href="index.html#about">من نحن</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h3>تواصل معنا</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> الرياض، المملكة العربية السعودية</p>
+                    <p><i class="fas fa-phone"></i> +966 12 345 6789</p>
+                    <p><i class="fas fa-envelope"></i> info@styleshop.com</p>
+                </div>
+                <div class="footer-social">
+                    <h3>تابعنا</h3>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-snapchat"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 ستايل شوب. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="product-codes.js"></script>
+    <script src="telegram.js"></script>
+    <script src="checkout.js"></script>
+    <script src="admin.js"></script>
+    
+    <style>
+        /* أنماط قسم إدارة الأكواد */
+        .admin-section {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px dashed #ccc;
+            border-radius: var(--border-radius);
+            background-color: #f9f9f9;
+        }
+        
+        .admin-section-visible {
+            animation: highlight 1s ease-in-out;
+        }
+        
+        @keyframes highlight {
+            0% { background-color: #f9f9f9; }
+            50% { background-color: #ffe0e0; }
+            100% { background-color: #f9f9f9; }
+        }
+        
+        .code-example {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            direction: ltr;
+            text-align: left;
+        }
+        
+        .code-example pre {
+            margin: 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
+        .admin-hide-btn {
+            margin-bottom: 15px;
+            background-color: #f44336;
+            color: white;
+        }
+    </style>
+</body>
+</html>

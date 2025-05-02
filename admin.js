@@ -1,0 +1,490 @@
+// ملف إدارة المتجر - admin.js
+
+// متغيرات عامة
+let editingProductId = null;
+let editingCodeId = null;
+
+// تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+    // إعداد علامات التبويب
+    setupTabs();
+    
+    // عرض المنتجات وأكواد المنتجات
+    displayProducts();
+    displayProductCodes();
+    
+    // إعداد أحداث النماذج
+    setupFormEvents();
+
+    // الوصول السريع للوحة الإدارة من الصفحة الرئيسية
+    setupAdminAccess();
+});
+
+// إعداد الوصول السريع للوحة الإدارة
+function setupAdminAccess() {
+    const logoElement = document.querySelector('.logo h1');
+    let clickCount = 0;
+    let clickTimer;
+
+    if (logoElement) {
+        logoElement.addEventListener('click', function(e) {
+            e.preventDefault();
+            clickCount++;
+            
+            // إعادة ضبط العداد بعد ثانيتين
+            clearTimeout(clickTimer);
+            clickTimer = setTimeout(() => {
+                clickCount = 0;
+            }, 2000);
+            
+            // الانتقال إلى لوحة الإدارة بعد 5 نقرات متتالية
+            if (clickCount >= 5) {
+                window.location.href = 'admin-panel.html';
+                clickCount = 0;
+            }
+        });
+    }
+}
+
+// إعداد علامات التبويب
+function setupTabs() {
+    const tabs = document.querySelectorAll('.admin-tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            // إزالة الفئة النشطة من جميع علامات التبويب
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // إضافة الفئة النشطة للعلامة المحددة
+            this.classList.add('active');
+            const tabId = this.getAttribute('data-tab');
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+}
+
+// عرض المنتجات في الجدول
+function displayProducts() {
+    const tableBody = document.getElementById('products-table-body');
+    if (!tableBody) return;
+    
+    tableBody.innerHTML = '';
+    
+    products.forEach(product => {
+        const row = document.createElement('tr');
+        
+        row.innerHTML = `
+            <td>${product.id}</td>
+            <td><img src="${product.image}" alt="${product.title}" width="50"></td>
+            <td>${product.title}</td>
+            <td>${getCategoryName(product.category)}</td>
+            <td>${product.price} جنيه مصري</td>
+            <td>${product.inStock ? 'نعم' : 'لا'}</td>
+            <td>
+                <button class="action-btn edit-btn" data-id="${product.id}">تعديل</button>
+                <button class="action-btn delete-btn" data-id="${product.id}">حذف</button>
+            </td>
+        `;
+        
+        tableBody.appendChild(row);
+    });
+    
+    // إضافة أحداث للأزرار
+    document.querySelectorAll('.edit-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = parseInt(this.getAttribute('data-id'));
+            editProduct(productId);
+        });
+    });
+    
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = parseInt(this.getAttribute('data-id'));
+            deleteProduct(productId);
+        });
+    });
+}
+
+// عرض أكواد المنتجات في الجدول
+function displayProductCodes() {
+    const tableBody = document.getElementById('codes-table-body');
+    if (!tableBody) return;
+    
+    tableBody.innerHTML = '';
+    
+    // تحويل كائن productCodes إلى مصفوفة للعرض
+    Object.entries(productCodes).forEach(([id, code]) => {
+        const row = document.createElement('tr');
+        
+        row.innerHTML = `
+            <td>${id}</td>
+            <td>${code}</td>
+            <td>
+                <button class="action-btn edit-btn" data-id="${id}">تعديل</button>
+                <button class="action-btn delete-btn" data-id="${id}">حذف</button>
+            </td>
+        `;
+        
+        tableBody.appendChild(row);
+    });
+    
+    // إضافة أحداث للأزرار
+    document.querySelectorAll('#codes-table-body .edit-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const codeId = this.getAttribute('data-id');
+            editProductCode(codeId);
+        });
+    });
+    
+    document.querySelectorAll('#codes-table-body .delete-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const codeId = this.getAttribute('data-id');
+            deleteProductCode(codeId);
+        });
+    });
+}
+
+// إعداد أحداث النماذج
+function setupFormEvents() {
+    // زر إضافة منتج جديد
+    const addProductBtn = document.getElementById('add-product-btn');
+    if (addProductBtn) {
+        addProductBtn.addEventListener('click', function() {
+            showProductForm();
+        });
+    }
+    
+    // زر إلغاء نموذج المنتج
+    const cancelFormBtn = document.getElementById('cancel-form');
+    if (cancelFormBtn) {
+        cancelFormBtn.addEventListener('click', function() {
+            hideProductForm();
+        });
+    }
+    
+    // إضافة لون جديد
+    const addColorBtn = document.getElementById('add-color');
+    if (addColorBtn) {
+        addColorBtn.addEventListener('click', function() {
+            addColor();
+        });
+    }
+    
+    // إضافة مقاس جديد
+    const addSizeBtn = document.getElementById('add-size');
+    if (addSizeBtn) {
+        addSizeBtn.addEventListener('click', function() {
+            addSize();
+        });
+    }
+    
+    // تقديم نموذج المنتج
+    const productForm = document.getElementById('product-form');
+    if (productForm) {
+        productForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveProduct();
+        });
+    }
+    
+    // زر إضافة كود جديد
+    const addCodeBtn = document.getElementById('add-code-btn');
+    if (addCodeBtn) {
+        addCodeBtn.addEventListener('click', function() {
+            showCodeForm();
+        });
+    }
+    
+    // زر إلغاء نموذج الكود
+    const cancelCodeFormBtn = document.getElementById('cancel-code-form');
+    if (cancelCodeFormBtn) {
+        cancelCodeFormBtn.addEventListener('click', function() {
+            hideCodeForm();
+        });
+    }
+    
+    // تقديم نموذج الكود
+    const codeForm = document.getElementById('code-form');
+    if (codeForm) {
+        codeForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveProductCode();
+        });
+    }
+}
+
+// إظهار نموذج المنتج
+function showProductForm() {
+    document.getElementById('form-title').textContent = 'إضافة منتج جديد';
+    document.getElementById('product-form-container').style.display = 'block';
+    document.getElementById('product-form').reset();
+    document.getElementById('colors-container').innerHTML = '';
+    document.getElementById('sizes-container').innerHTML = '';
+    editingProductId = null;
+}
+
+// إخفاء نموذج المنتج
+function hideProductForm() {
+    document.getElementById('product-form-container').style.display = 'none';
+    editingProductId = null;
+}
+
+// إظهار نموذج الكود
+function showCodeForm() {
+    document.getElementById('code-form-title').textContent = 'إضافة كود منتج جديد';
+    document.getElementById('code-form-container').style.display = 'block';
+    document.getElementById('code-form').reset();
+    editingCodeId = null;
+}
+
+// إخفاء نموذج الكود
+function hideCodeForm() {
+    document.getElementById('code-form-container').style.display = 'none';
+    editingCodeId = null;
+}
+
+// إضافة لون جديد
+function addColor() {
+    const colorInput = document.getElementById('new-color');
+    const color = colorInput.value.trim();
+    
+    if (color) {
+        const colorsContainer = document.getElementById('colors-container');
+        const colorItem = document.createElement('div');
+        colorItem.className = 'color-item';
+        colorItem.innerHTML = `
+            <span>${color}</span>
+            <span class="remove-item">×</span>
+        `;
+        
+        colorsContainer.appendChild(colorItem);
+        colorInput.value = '';
+        
+        // إضافة حدث لإزالة اللون
+        colorItem.querySelector('.remove-item').addEventListener('click', function() {
+            colorItem.remove();
+        });
+    }
+}
+
+// إضافة مقاس جديد
+function addSize() {
+    const sizeInput = document.getElementById('new-size');
+    const size = sizeInput.value.trim();
+    
+    if (size) {
+        const sizesContainer = document.getElementById('sizes-container');
+        const sizeItem = document.createElement('div');
+        sizeItem.className = 'size-item';
+        sizeItem.innerHTML = `
+            <span>${size}</span>
+            <span class="remove-item">×</span>
+        `;
+        
+        sizesContainer.appendChild(sizeItem);
+        sizeInput.value = '';
+        
+        // إضافة حدث لإزالة المقاس
+        sizeItem.querySelector('.remove-item').addEventListener('click', function() {
+            sizeItem.remove();
+        });
+    }
+}
+
+// تحرير منتج
+function editProduct(productId) {
+    const product = products.find(p => p.id === productId);
+    if (!product) return;
+    
+    editingProductId = productId;
+    document.getElementById('form-title').textContent = 'تعديل المنتج';
+    document.getElementById('product-id').value = product.id;
+    document.getElementById('title').value = product.title;
+    document.getElementById('category').value = product.category;
+    document.getElementById('price').value = product.price;
+    document.getElementById('oldPrice').value = product.oldPrice || '';
+    document.getElementById('image').value = product.image;
+    document.getElementById('description').value = product.description;
+    document.getElementById('badge').value = product.badge || '';
+    document.getElementById('inStock').value = product.inStock.toString();
+    
+    // إضافة الألوان
+    const colorsContainer = document.getElementById('colors-container');
+    colorsContainer.innerHTML = '';
+    product.colors.forEach(color => {
+        const colorItem = document.createElement('div');
+        colorItem.className = 'color-item';
+        colorItem.innerHTML = `
+            <span>${color}</span>
+            <span class="remove-item">×</span>
+        `;
+        
+        colorsContainer.appendChild(colorItem);
+        
+        // إضافة حدث لإزالة اللون
+        colorItem.querySelector('.remove-item').addEventListener('click', function() {
+            colorItem.remove();
+        });
+    });
+    
+    // إضافة المقاسات
+    const sizesContainer = document.getElementById('sizes-container');
+    sizesContainer.innerHTML = '';
+    product.sizes.forEach(size => {
+        const sizeItem = document.createElement('div');
+        sizeItem.className = 'size-item';
+        sizeItem.innerHTML = `
+            <span>${size}</span>
+            <span class="remove-item">×</span>
+        `;
+        
+        sizesContainer.appendChild(sizeItem);
+        
+        // إضافة حدث لإزالة المقاس
+        sizeItem.querySelector('.remove-item').addEventListener('click', function() {
+            sizeItem.remove();
+        });
+    });
+    
+    document.getElementById('product-form-container').style.display = 'block';
+}
+
+// حذف منتج
+function deleteProduct(productId) {
+    if (confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
+        const index = products.findIndex(p => p.id === productId);
+        if (index !== -1) {
+            products.splice(index, 1);
+            displayProducts();
+            showNotification('تم حذف المنتج بنجاح', 'success');
+        }
+    }
+}
+
+// حفظ المنتج
+function saveProduct() {
+    const productId = document.getElementById('product-id').value;
+    const title = document.getElementById('title').value;
+    const category = document.getElementById('category').value;
+    const price = parseFloat(document.getElementById('price').value);
+    const oldPrice = document.getElementById('oldPrice').value ? parseFloat(document.getElementById('oldPrice').value) : null;
+    const image = document.getElementById('image').value;
+    const description = document.getElementById('description').value;
+    const badge = document.getElementById('badge').value || null;
+    const inStock = document.getElementById('inStock').value === 'true';
+    
+    // جمع الألوان
+    const colors = [];
+    document.querySelectorAll('#colors-container .color-item span:first-child').forEach(span => {
+        colors.push(span.textContent);
+    });
+    
+    // جمع المقاسات
+    const sizes = [];
+    document.querySelectorAll('#sizes-container .size-item span:first-child').forEach(span => {
+        sizes.push(span.textContent);
+    });
+    
+    if (editingProductId) {
+        // تحديث منتج موجود
+        const index = products.findIndex(p => p.id === editingProductId);
+        if (index !== -1) {
+            products[index] = {
+                id: editingProductId,
+                title,
+                category,
+                price,
+                oldPrice,
+                image,
+                description,
+                colors,
+                sizes,
+                inStock,
+                badge
+            };
+            showNotification('تم تحديث المنتج بنجاح', 'success');
+        }
+    } else {
+        // إضافة منتج جديد
+        const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
+        products.push({
+            id: newId,
+            title,
+            category,
+            price,
+            oldPrice,
+            image,
+            description,
+            colors,
+            sizes,
+            inStock,
+            badge
+        });
+        showNotification('تم إضافة المنتج بنجاح', 'success');
+    }
+    
+    hideProductForm();
+    displayProducts();
+}
+
+// تحرير كود منتج
+function editProductCode(codeId) {
+    const code = productCodes[codeId];
+    if (!code) return;
+    
+    editingCodeId = codeId;
+    document.getElementById('code-form-title').textContent = 'تعديل كود المنتج';
+    document.getElementById('product-code-id').value = codeId;
+    document.getElementById('product-code').value = code;
+    
+    document.getElementById('code-form-container').style.display = 'block';
+}
+
+// حذف كود منتج
+function deleteProductCode(codeId) {
+    if (confirm('هل أنت متأكد من حذف هذا الكود؟')) {
+        if (productCodes.hasOwnProperty(codeId)) {
+            delete productCodes[codeId];
+            displayProductCodes();
+            showNotification('تم حذف كود المنتج بنجاح', 'success');
+        }
+    }
+}
+
+// حفظ كود المنتج
+function saveProductCode() {
+    const codeId = document.getElementById('product-code-id').value;
+    const code = document.getElementById('product-code').value;
+    
+    productCodes[codeId] = code;
+    
+    hideCodeForm();
+    displayProductCodes();
+    showNotification('تم حفظ كود المنتج بنجاح', 'success');
+}
+
+// عرض إشعار
+function showNotification(message, type) {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.className = `notification ${type}`;
+    notification.style.display = 'block';
+    
+    setTimeout(() => {
+        notification.style.display = 'none';
+    }, 3000);
+}
+
+// الحصول على اسم الفئة
+function getCategoryName(category) {
+    const categories = {
+        'tshirts': 'تيشيرتات',
+        'pants': 'بناطيل',
+        'shoes': 'أحذية',
+        'accessories': 'إكسسوارات'
+    };
+    
+    return categories[category] || category;
+}
