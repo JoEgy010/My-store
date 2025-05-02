@@ -16,7 +16,31 @@ function getProductCode(productId) {
 
 // دالة لإضافة أو تحديث كود منتج
 function updateProductCode(productId, code) {
+    // التحقق من صحة المدخلات
+    if (!productId || !code) {
+        console.error("خطأ: يجب توفير معرف المنتج والكود");
+        return false;
+    }
+    
+    // التحقق من تنسيق الكود (يجب أن يتبع نمط XX000-XYZ)
+    const codePattern = /^[A-Z]{2}\d{3}-[A-Z]{3}$/;
+    if (!codePattern.test(code)) {
+        console.error("خطأ: تنسيق الكود غير صحيح. يجب أن يكون بتنسيق XX000-XYZ");
+        return false;
+    }
+    
+    // تحديث الكود
     productCodes[productId] = code;
+    
+    // محاولة حفظ التغييرات في التخزين المحلي إذا كان متاحًا
+    try {
+        if (typeof localStorage !== 'undefined') {
+            localStorage.setItem('productCodes', JSON.stringify(productCodes));
+        }
+    } catch (error) {
+        console.warn("تعذر حفظ التغييرات في التخزين المحلي:", error);
+    }
+    
     return true;
 }
 
