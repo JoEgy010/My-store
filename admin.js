@@ -6,6 +6,9 @@ let editingCodeId = null;
 
 // تحميل الصفحة
 document.addEventListener('DOMContentLoaded', function() {
+    // تحميل المنتجات من localStorage إذا كانت موجودة
+    loadProductsFromLocalStorage();
+    
     // إعداد علامات التبويب
     setupTabs();
     
@@ -19,6 +22,23 @@ document.addEventListener('DOMContentLoaded', function() {
     // الوصول السريع للوحة الإدارة من الصفحة الرئيسية
     setupAdminAccess();
 });
+
+// حفظ المنتجات في localStorage
+function saveProductsToLocalStorage() {
+    localStorage.setItem('products', JSON.stringify(products));
+}
+
+// تحميل المنتجات من localStorage
+function loadProductsFromLocalStorage() {
+    const savedProducts = localStorage.getItem('products');
+    if (savedProducts) {
+        // تحديث مصفوفة المنتجات العالمية بالبيانات المحفوظة
+        const parsedProducts = JSON.parse(savedProducts);
+        // استبدال المنتجات الموجودة بالمنتجات المحفوظة
+        products.length = 0; // تفريغ المصفوفة
+        parsedProducts.forEach(product => products.push(product));
+    }
+}
 
 // إعداد الوصول السريع للوحة الإدارة
 function setupAdminAccess() {
@@ -357,6 +377,8 @@ function deleteProduct(productId) {
         const index = products.findIndex(p => p.id === productId);
         if (index !== -1) {
             products.splice(index, 1);
+            // حفظ التغييرات في localStorage
+            saveProductsToLocalStorage();
             displayProducts();
             showNotification('تم حذف المنتج بنجاح', 'success');
         }
@@ -365,15 +387,50 @@ function deleteProduct(productId) {
 
 // حفظ المنتج
 function saveProduct() {
-    const productId = document.getElementById('product-id').value;
-    const title = document.getElementById('title').value;
+    // التحقق من صحة المدخلات
+    const title = document.getElementById('title').value.trim();
     const category = document.getElementById('category').value;
-    const price = parseFloat(document.getElementById('price').value);
-    const oldPrice = document.getElementById('oldPrice').value ? parseFloat(document.getElementById('oldPrice').value) : null;
-    const image = document.getElementById('image').value;
-    const description = document.getElementById('description').value;
-    const badge = document.getElementById('badge').value || null;
+    const priceInput = document.getElementById('price').value;
+    const oldPriceInput = document.getElementById('oldPrice').value;
+    const image = document.getElementById('image').value.trim();
+    const description = document.getElementById('description').value.trim();
+    const badge = document.getElementById('badge').value.trim() || null;
     const inStock = document.getElementById('inStock').value === 'true';
+    
+    // التحقق من الحقول المطلوبة
+    if (!title) {
+        showNotification('يرجى إدخال عنوان المنتج', 'error');
+        return;
+    }
+    
+    if (!category) {
+        showNotification('يرجى اختيار فئة المنتج', 'error');
+        return;
+    }
+    
+    if (!priceInput || isNaN(parseFloat(priceInput)) || parseFloat(priceInput) <= 0) {
+        showNotification('يرجى إدخال سعر صحيح للمنتج', 'error');
+        return;
+    }
+    
+    if (oldPriceInput && (isNaN(parseFloat(oldPriceInput)) || parseFloat(oldPriceInput) <= 0)) {
+        showNotification('يرجى إدخال سعر قديم صحيح للمنتج', 'error');
+        return;
+    }
+    
+    if (!image) {
+        showNotification('يرجى إدخال رابط صورة المنتج', 'error');
+        return;
+    }
+    
+    if (!description) {
+        showNotification('يرجى إدخال وصف المنتج', 'error');
+        return;
+    }
+    
+    // تحويل القيم إلى الأنواع المناسبة
+    const price = parseFloat(priceInput);
+    const oldPrice = oldPriceInput ? parseFloat(oldPriceInput) : null;
     
     // جمع الألوان
     const colors = [];
@@ -381,11 +438,23 @@ function saveProduct() {
         colors.push(span.textContent);
     });
     
+    // التحقق من وجود لون واحد على الأقل
+    if (colors.length === 0) {
+        showNotification('يرجى إضافة لون واحد على الأقل', 'error');
+        return;
+    }
+    
     // جمع المقاسات
     const sizes = [];
     document.querySelectorAll('#sizes-container .size-item span:first-child').forEach(span => {
         sizes.push(span.textContent);
     });
+    
+    // التحقق من وجود مقاس واحد على الأقل
+    if (sizes.length === 0) {
+        showNotification('يرجى إضافة مقاس واحد على الأقل', 'error');
+        return;
+    }
     
     if (editingProductId) {
         // تحديث منتج موجود
@@ -424,6 +493,9 @@ function saveProduct() {
         });
         showNotification('تم إضافة المنتج بنجاح', 'success');
     }
+    
+    // حفظ التغييرات في localStorage
+    saveProductsToLocalStorage();
     
     hideProductForm();
     displayProducts();
@@ -472,9 +544,16 @@ function showNotification(message, type) {
     notification.className = `notification ${type}`;
     notification.style.display = 'block';
     
+    // إزالة الإشعار بعد 3 ثواني
     setTimeout(() => {
         notification.style.display = 'none';
     }, 3000);
+    
+    // التمرير إلى أعلى الصفحة لضمان رؤية الإشعار
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
 }
 
 // الحصول على اسم الفئة
