@@ -398,7 +398,76 @@ function editProduct(productId) {
         });
     });
     
+    // إضافة عرض مرئي للألوان
+    const colorPreviewContainer = document.getElementById('color-preview-container') || createColorPreviewContainer();
+    colorPreviewContainer.innerHTML = '';
+    
+    // إنشاء عناصر الألوان المرئية
+    product.colors.forEach((color, index) => {
+        const colorElement = document.createElement('div');
+        colorElement.className = 'color-option admin-color';
+        colorElement.setAttribute('data-color', color);
+        colorElement.setAttribute('title', color);
+        
+        const colorName = document.createElement('span');
+        colorName.className = 'color-name';
+        colorName.textContent = color;
+        
+        colorElement.appendChild(colorName);
+        colorPreviewContainer.appendChild(colorElement);
+    });
+    
     document.getElementById('product-form-container').style.display = 'block';
+}
+
+// إنشاء حاوية معاينة الألوان
+function createColorPreviewContainer() {
+    const colorsField = document.getElementById('edit-product-colors');
+    const container = document.createElement('div');
+    container.id = 'color-preview-container';
+    container.className = 'color-options-container';
+    
+    // إضافة عنوان
+    const title = document.createElement('p');
+    title.innerHTML = '<strong>معاينة الألوان:</strong>';
+    title.style.marginTop = '10px';
+    
+    // إدراج العناصر في الصفحة
+    colorsField.parentNode.insertBefore(title, colorsField.nextSibling);
+    colorsField.parentNode.insertBefore(container, title.nextSibling);
+    
+    // إضافة مستمع أحداث لحقل الألوان لتحديث المعاينة
+    colorsField.addEventListener('input', updateColorPreview);
+    
+    return container;
+}
+
+// تحديث معاينة الألوان
+function updateColorPreview() {
+    const colorsField = document.getElementById('edit-product-colors');
+    const colorPreviewContainer = document.getElementById('color-preview-container');
+    
+    if (!colorPreviewContainer) return;
+    
+    // تقسيم النص إلى مصفوفة ألوان
+    const colors = colorsField.value.split(',').map(color => color.trim()).filter(color => color);
+    
+    // تحديث حاوية الألوان
+    colorPreviewContainer.innerHTML = '';
+    
+    colors.forEach(color => {
+        const colorElement = document.createElement('div');
+        colorElement.className = 'color-option admin-color';
+        colorElement.setAttribute('data-color', color);
+        colorElement.setAttribute('title', color);
+        
+        const colorName = document.createElement('span');
+        colorName.className = 'color-name';
+        colorName.textContent = color;
+        
+        colorElement.appendChild(colorName);
+        colorPreviewContainer.appendChild(colorElement);
+    });
 }
 
 // حذف منتج
