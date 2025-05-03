@@ -64,6 +64,11 @@ header {
     position: sticky;
     top: 0;
     z-index: 100;
+    transition: transform 0.3s ease;
+}
+
+header.hidden {
+    transform: translateY(-100%);
 }
 
 header .container {
@@ -689,6 +694,7 @@ footer {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 30px;
     margin-bottom: 40px;
+    padding: 0 15px;
 }
 
 .footer-logo h2 {
@@ -830,6 +836,7 @@ footer {
     display: flex;
     gap: 30px;
     margin-top: 30px;
+    padding: 0 15px;
 }
 
 .checkout-order-summary {
