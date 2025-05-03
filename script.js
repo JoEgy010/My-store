@@ -1,3 +1,23 @@
+// التحكم في إخفاء وإظهار الهيدر عند التمرير
+let lastScrollTop = 0;
+const header = document.querySelector('header');
+const scrollThreshold = 50; // عتبة التمرير بالبكسل
+
+window.addEventListener('scroll', function() {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    
+    // إذا تم التمرير لأسفل أكثر من العتبة، قم بإخفاء الهيدر
+    if (scrollTop > lastScrollTop && scrollTop > scrollThreshold) {
+        header.classList.add('hidden');
+    } 
+    // إذا تم التمرير لأعلى، قم بإظهار الهيدر
+    else if (scrollTop < lastScrollTop) {
+        header.classList.remove('hidden');
+    }
+    
+    lastScrollTop = scrollTop;
+});
+
 // بيانات المنتجات - المصفوفة الافتراضية
 let products = [
     {
