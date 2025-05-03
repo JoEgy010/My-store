@@ -366,6 +366,25 @@ function getCategoryButtonText(category) {
     }
 }
 
+// الحصول على الصورة الأولية للمنتج بناءً على تنسيق البيانات
+function getInitialProductImage(product) {
+    // التحقق من تنسيق الألوان
+    if (product.colors && product.colors.length > 0) {
+        // التنسيق القديم (كائن يحتوي على name و image)
+        if (typeof product.colors[0] === 'object' && product.colors[0].image) {
+            return product.colors[0].image;
+        }
+        
+        // التنسيق الجديد (مصفوفة من النصوص مع خاصية colorImages)
+        if (typeof product.colors[0] === 'string' && product.colorImages && product.colorImages[product.colors[0]]) {
+            return product.colorImages[product.colors[0]];
+        }
+    }
+    
+    // استخدام الصورة الافتراضية للمنتج إذا لم تتوفر صور للألوان
+    return product.image;
+}
+
 // إضافة منتج إلى سلة التسوق
 function addToCart(productId, quantity) {
     const product = products.find(p => p.id === productId);
@@ -434,18 +453,39 @@ function showProductDetails(productId) {
     
     // إنشاء عناصر الألوان المرئية بدلاً من القائمة المنسدلة
     let colorsHTML = '';
-    product.colors.forEach((colorObj, index) => {
-        // تحديد اللون الأول كلون افتراضي مختار
-        const isSelected = index === 0 ? 'selected' : '';
-        colorsHTML += `<div class="color-option ${isSelected}" data-color="${colorObj.name}" data-image="${colorObj.image}" title="${colorObj.name}">
-            <span class="color-name">${colorObj.name}</span>
-        </div>`;
-    });
+    
+    // التعامل مع تنسيقات الألوان المختلفة (القديمة والجديدة)
+    if (product.colors.length > 0 && typeof product.colors[0] === 'object') {
+        // التنسيق القديم (كائن يحتوي على name و image)
+        product.colors.forEach((colorObj, index) => {
+            // تحديد اللون الأول كلون افتراضي مختار
+            const isSelected = index === 0 ? 'selected' : '';
+            colorsHTML += `<div class="color-option ${isSelected}" data-color="${colorObj.name}" data-image="${colorObj.image}" title="${colorObj.name}">
+                <span class="color-name">${colorObj.name}</span>
+            </div>`;
+        });
+    } else {
+        // التنسيق الجديد (مصفوفة من النصوص)
+        product.colors.forEach((color, index) => {
+            // تحديد اللون الأول كلون افتراضي مختار
+            const isSelected = index === 0 ? 'selected' : '';
+            
+            // تحديد صورة اللون (من خاصية colorImages الجديدة أو الصورة الافتراضية)
+            let colorImage = product.image; // الصورة الافتراضية
+            if (product.colorImages && product.colorImages[color]) {
+                colorImage = product.colorImages[color];
+            }
+            
+            colorsHTML += `<div class="color-option ${isSelected}" data-color="${color}" data-image="${colorImage}" title="${color}">
+                <span class="color-name">${color}</span>
+            </div>`;
+        });
+    }
     
     productDetails.innerHTML = `
         <div class="product-details-container">
             <div class="product-details-image">
-                <img id="product-main-image" src="${product.colors[0].image}" alt="${product.title}">
+                <img id="product-main-image" src="${getInitialProductImage(product)}" alt="${product.title}">
                 ${product.badge ? `<span class="product-badge">${product.badge}</span>` : ''}
             </div>
             <div class="product-details-info">
