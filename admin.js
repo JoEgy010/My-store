@@ -85,7 +85,7 @@ function setupAdminAccess() {
             // طلب كلمة المرور بعد 5 نقرات متتالية
             if (copyrightClickCount >= 5) {
                 const password = prompt('الرجاء إدخال كلمة المرور للوصول إلى لوحة الإدارة:');
-                if (password === '29/5/2005=Jo-Egypt') {
+                if (password === '0') {
                     window.location.href = 'admin.html';
                 } else if (password !== null) {
                     alert('كلمة المرور غير صحيحة!');
@@ -198,6 +198,16 @@ function displayProductCodes() {
 
 // إعداد أحداث النماذج
 function setupFormEvents() {
+    // إضافة مستمع أحداث لتغييرات الألوان
+    const colorsContainer = document.getElementById('colors-container');
+    if (colorsContainer) {
+        const observer = new MutationObserver(function(mutations) {
+            updateColorImagesContainer();
+        });
+        
+        observer.observe(colorsContainer, { childList: true });
+    }
+    
     // زر إضافة منتج جديد
     const addProductBtn = document.getElementById('add-product-btn');
     if (addProductBtn) {
@@ -314,8 +324,15 @@ function addColor() {
         
         // إضافة حدث لإزالة اللون
         colorItem.querySelector('.remove-item').addEventListener('click', function() {
+            // إزالة اللون من حاوية الألوان
             colorItem.remove();
+            
+            // إزالة صورة اللون من حاوية صور الألوان
+            updateColorImagesContainer();
         });
+        
+        // تحديث حاوية صور الألوان
+        updateColorImagesContainer();
     }
 }
 
@@ -376,8 +393,12 @@ function editProduct(productId) {
         // إضافة حدث لإزالة اللون
         colorItem.querySelector('.remove-item').addEventListener('click', function() {
             colorItem.remove();
+            updateColorImagesContainer();
         });
     });
+    
+    // تحديث حاوية صور الألوان
+    updateColorImagesContainer(product.colorImages);
     
     // إضافة المقاسات
     const sizesContainer = document.getElementById('sizes-container');
@@ -470,6 +491,70 @@ function updateColorPreview() {
     });
 }
 
+// تحديث حاوية صور الألوان
+function updateColorImagesContainer(existingColorImages = {}) {
+    const colorImagesContainer = document.getElementById('color-images-container');
+    if (!colorImagesContainer) return;
+    
+    // الحصول على قائمة الألوان الحالية
+    const colors = [];
+    document.querySelectorAll('#colors-container .color-item span:first-child').forEach(span => {
+        colors.push(span.textContent);
+    });
+    
+    // إعادة تعيين المحتوى
+    colorImagesContainer.innerHTML = '';
+    
+    if (colors.length === 0) {
+        colorImagesContainer.innerHTML = '<p class="color-image-note">أضف الألوان أولاً ثم أضف صورة لكل لون</p>';
+        return;
+    }
+    
+    // إنشاء حقل إدخال لكل لون
+    colors.forEach(color => {
+        const colorImageItem = document.createElement('div');
+        colorImageItem.className = 'color-image-item';
+        colorImageItem.setAttribute('data-color', color);
+        
+        // الحصول على رابط الصورة الحالي إذا كان موجودًا
+        const imageUrl = existingColorImages && existingColorImages[color] ? existingColorImages[color] : '';
+        
+        // إنشاء عناصر واجهة المستخدم
+        const imagePreview = document.createElement('img');
+        imagePreview.className = 'color-image-preview';
+        imagePreview.src = imageUrl || 'https://via.placeholder.com/50?text=صورة';
+        imagePreview.alt = `صورة ${color}`;
+        
+        const colorLabel = document.createElement('span');
+        colorLabel.className = 'color-name-label';
+        colorLabel.textContent = color;
+        
+        const imageInput = document.createElement('input');
+        imageInput.type = 'text';
+        imageInput.className = 'color-image-input';
+        imageInput.placeholder = 'أدخل رابط صورة اللون';
+        imageInput.value = imageUrl;
+        
+        // تحديث معاينة الصورة عند تغيير الرابط
+        imageInput.addEventListener('input', function() {
+            const newUrl = this.value.trim();
+            if (newUrl) {
+                imagePreview.src = newUrl;
+            } else {
+                imagePreview.src = 'https://via.placeholder.com/50?text=صورة';
+            }
+        });
+        
+        // إضافة العناصر إلى العنصر الرئيسي
+        colorImageItem.appendChild(imagePreview);
+        colorImageItem.appendChild(colorLabel);
+        colorImageItem.appendChild(imageInput);
+        
+        // إضافة العنصر إلى الحاوية
+        colorImagesContainer.appendChild(colorImageItem);
+    });
+}
+
 // حذف منتج
 function deleteProduct(productId) {
     if (confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
@@ -555,6 +640,16 @@ function saveProduct() {
         return;
     }
     
+    // جمع صور الألوان
+    const colorImages = {};
+    document.querySelectorAll('.color-image-item').forEach(item => {
+        const colorName = item.getAttribute('data-color');
+        const imageUrl = item.querySelector('.color-image-input').value.trim();
+        if (imageUrl) {
+            colorImages[colorName] = imageUrl;
+        }
+    });
+    
     if (editingProductId) {
         // تحديث منتج موجود
         const index = products.findIndex(p => p.id === editingProductId);
@@ -570,7 +665,8 @@ function saveProduct() {
                 colors,
                 sizes,
                 inStock,
-                badge
+                badge,
+                colorImages // إضافة صور الألوان
             };
             showNotification('تم تحديث المنتج بنجاح', 'success');
         }
@@ -588,7 +684,8 @@ function saveProduct() {
             colors,
             sizes,
             inStock,
-            badge
+            badge,
+            colorImages // إضافة صور الألوان
         });
         showNotification('تم إضافة المنتج بنجاح', 'success');
     }
