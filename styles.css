@@ -637,6 +637,84 @@ nav ul li a:hover, nav ul li a.active {
     font-weight: bold;
 }
 
+/* أنماط خيارات الألوان */
+.color-options-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 10px 0 15px;
+}
+
+.color-option {
+    width: 60px;
+    height: 40px;
+    border-radius: var(--border-radius);
+    border: 2px solid var(--gray-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    transition: var(--transition);
+    background-color: var(--light-color);
+    overflow: hidden;
+}
+
+.color-option:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--box-shadow);
+}
+
+.color-option.selected {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(58, 110, 165, 0.3);
+}
+
+.color-option.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background-color: var(--primary-color);
+    color: white;
+    width: 15px;
+    height: 15px;
+    font-size: 10px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.color-name {
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+}
+
+#selected-color-name {
+    display: inline-block;
+    margin-right: 5px;
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+/* أنماط خيارات الألوان في لوحة الإدارة */
+.admin-color {
+    width: 50px;
+    height: 35px;
+    margin-bottom: 5px;
+    margin-left: 5px;
+    display: inline-flex;
+}
+
+#color-preview-container {
+    margin-top: 10px;
+    margin-bottom: 15px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
 .product-details-actions {
     display: flex;
     gap: 15px;
@@ -986,3 +1064,4 @@ footer {
         flex-direction: column;
     }
 }
+
