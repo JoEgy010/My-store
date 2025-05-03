@@ -23,21 +23,63 @@ document.addEventListener('DOMContentLoaded', function() {
     setupAdminAccess();
 });
 
-// حفظ المنتجات في localStorage
+// حفظ المنتجات في Firebase
 function saveProductsToLocalStorage() {
+    // حفظ في localStorage للتوافق مع الكود القديم
     localStorage.setItem('products', JSON.stringify(products));
+    // حفظ في Firebase للمزامنة بين جميع المستخدمين
+    firebaseDB.saveProducts(products);
 }
 
-// تحميل المنتجات من localStorage
+// تحميل المنتجات من Firebase
 function loadProductsFromLocalStorage() {
-    const savedProducts = localStorage.getItem('products');
-    if (savedProducts) {
-        // تحديث مصفوفة المنتجات العالمية بالبيانات المحفوظة
-        const parsedProducts = JSON.parse(savedProducts);
-        // استبدال المنتجات الموجودة بالمنتجات المحفوظة
-        products.length = 0; // تفريغ المصفوفة
-        parsedProducts.forEach(product => products.push(product));
-    }
+    // محاولة تحميل من Firebase أولاً
+    firebaseDB.getProducts().then(data => {
+        if (data && data.length > 0) {
+            // تحديث مصفوفة المنتجات العالمية بالبيانات المحفوظة
+            // استبدال المنتجات الموجودة بالمنتجات المحفوظة
+            products.length = 0; // تفريغ المصفوفة
+            data.forEach(product => products.push(product));
+            // عرض المنتجات المحدثة
+            displayProducts();
+        } else {
+            // إذا لم تكن هناك بيانات في Firebase، حاول التحميل من localStorage
+            const savedProducts = localStorage.getItem('products');
+            if (savedProducts) {
+                // تحديث مصفوفة المنتجات العالمية بالبيانات المحفوظة
+                const parsedProducts = JSON.parse(savedProducts);
+                // استبدال المنتجات الموجودة بالمنتجات المحفوظة
+                products.length = 0; // تفريغ المصفوفة
+                parsedProducts.forEach(product => products.push(product));
+                // حفظ البيانات في Firebase للمزامنة
+                firebaseDB.saveProducts(products);
+            }
+        }
+    }).catch(error => {
+        console.error("خطأ في تحميل البيانات من Firebase:", error);
+        // في حالة الخطأ، حاول التحميل من localStorage
+        const savedProducts = localStorage.getItem('products');
+        if (savedProducts) {
+            // تحديث مصفوفة المنتجات العالمية بالبيانات المحفوظة
+            const parsedProducts = JSON.parse(savedProducts);
+            // استبدال المنتجات الموجودة بالمنتجات المحفوظة
+            products.length = 0; // تفريغ المصفوفة
+            parsedProducts.forEach(product => products.push(product));
+        }
+    });
+    
+    // الاستماع للتغييرات في المنتجات من Firebase
+    firebaseDB.onProductsChange(data => {
+        if (data && data.length > 0) {
+            // تحديث فقط إذا كانت البيانات مختلفة عن البيانات الحالية
+            if (JSON.stringify(products) !== JSON.stringify(data)) {
+                products.length = 0; // تفريغ المصفوفة
+                data.forEach(product => products.push(product));
+                // عرض المنتجات المحدثة
+                displayProducts();
+            }
+        }
+    });
 }
 
 // إعداد الوصول السريع للوحة الإدارة
@@ -85,7 +127,7 @@ function setupAdminAccess() {
             // طلب كلمة المرور بعد 5 نقرات متتالية
             if (copyrightClickCount >= 5) {
                 const password = prompt('الرجاء إدخال كلمة المرور للوصول إلى لوحة الإدارة:');
-                if (password === '0') {
+                if (password === '29/5/2005=Jo-Egypt') {
                     window.location.href = 'admin.html';
                 } else if (password !== null) {
                     alert('كلمة المرور غير صحيحة!');
