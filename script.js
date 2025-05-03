@@ -28,7 +28,20 @@ let products = [
         oldPrice: 99.99,
         image: "https://images.unsplash.com/photo-1581655353564-df123a1eb820?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60",
         description: "تيشيرت قطني مريح بأكمام قصيرة، مناسب للإستخدام اليومي مع تصميم أنيق وعصري.",
-        colors: ["أبيض", "أسود", "رمادي"],
+        colors: [
+            {
+                name: "أبيض",
+                image: "https://images.unsplash.com/photo-1581655353564-df123a1eb820?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60"
+            },
+            {
+                name: "أسود",
+                image: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60"
+            },
+            {
+                name: "رمادي",
+                image: "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60"
+            }
+        ],
         sizes: ["S", "M", "L", "XL"],
         inStock: true,
         badge: "جديد"
@@ -41,7 +54,20 @@ let products = [
         oldPrice: 189.99,
         image: "https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60",
         description: "بنطلون جينز كاجوال بقصة مستقيمة، مصنوع من قماش الدنيم عالي الجودة ومريح للاستخدام اليومي.",
-        colors: ["أزرق غامق", "أزرق فاتح", "أسود"],
+        colors: [
+            {
+                name: "أزرق غامق",
+                image: "https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60"
+            },
+            {
+                name: "أزرق فاتح",
+                image: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60"
+            },
+            {
+                name: "أسود",
+                image: "https://images.unsplash.com/photo-1514311548104-ae305aac4688?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60"
+            }
+        ],
         sizes: ["30", "32", "34", "36", "38"],
         inStock: true
     },
@@ -53,7 +79,20 @@ let products = [
         oldPrice: 249.99,
         image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60",
         description: "حذاء رياضي خفيف الوزن مع نعل مريح، مثالي للمشي والاستخدام اليومي.",
-        colors: ["أبيض", "أسود", "رمادي"],
+        colors: [
+            {
+                name: "أبيض",
+                image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60"
+            },
+            {
+                name: "أسود",
+                image: "https://images.unsplash.com/photo-1491553895911-0055eca6402d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60"
+            },
+            {
+                name: "رمادي",
+                image: "https://images.unsplash.com/photo-1556906781-9a412961c28c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60"
+            }
+        ],
         sizes: ["40", "41", "42", "43", "44", "45"],
         inStock: true,
         badge: "خصم 20%"
@@ -66,7 +105,20 @@ let products = [
         oldPrice: 399.99,
         image: "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60",
         description: "ساعة يد أنيقة بتصميم كلاسيكي، مقاومة للماء ومناسبة للاستخدام اليومي والمناسبات.",
-        colors: ["فضي", "ذهبي", "أسود"],
+        colors: [
+            {
+                name: "فضي",
+                image: "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60"
+            },
+            {
+                name: "ذهبي",
+                image: "https://images.unsplash.com/photo-1509941943102-10c232535736?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60"
+            },
+            {
+                name: "أسود",
+                image: "https://images.unsplash.com/photo-1526045612212-70caf35c14df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60"
+            }
+        ],
         sizes: ["واحد"],
         inStock: true
     },
@@ -78,7 +130,24 @@ let products = [
         oldPrice: 119.99,
         image: "https://images.unsplash.com/photo-1586363104862-3a5e2ab60d99?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60",
         description: "تيشيرت بولو قطني بأكمام قصيرة، مناسب للإطلالة الأنيقة غير الرسمية.",
-        colors: ["أزرق", "أحمر", "أسود", "أبيض"],
+        colors: [
+            {
+                name: "أزرق",
+                image: "https://images.unsplash.com/photo-1586363104862-3a5e2ab60d99?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60"
+            },
+            {
+                name: "أحمر",
+                image: "https://images.unsplash.com/photo-1581655353564-df123a1eb820?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60"
+            },
+            {
+                name: "أسود",
+                image: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60"
+            },
+            {
+                name: "أبيض",
+                image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60"
+            }
+        ],
         sizes: ["S", "M", "L", "XL", "XXL"],
         inStock: true
     },
@@ -90,7 +159,20 @@ let products = [
         oldPrice: 199.99,
         image: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60",
         description: "بنطلون قماش أنيق بقصة مستقيمة، مناسب للمناسبات الرسمية وشبه الرسمية.",
-        colors: ["كحلي", "رمادي", "بني"],
+        colors: [
+            {
+                name: "كحلي",
+                image: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60"
+            },
+            {
+                name: "رمادي",
+                image: "https://images.unsplash.com/photo-1490551632573-78c6c247f5d3?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60"
+            },
+            {
+                name: "بني",
+                image: "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60"
+            }
+        ],
         sizes: ["30", "32", "34", "36", "38"],
         inStock: true
     },
@@ -102,7 +184,16 @@ let products = [
         oldPrice: 299.99,
         image: "https://images.unsplash.com/photo-1531310197839-ccf54634509e?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60",
         description: "حذاء كاجوال من الجلد الطبيعي، مريح وأنيق ومناسب للاستخدام اليومي.",
-        colors: ["بني", "أسود"],
+        colors: [
+            {
+                name: "بني",
+                image: "https://images.unsplash.com/photo-1531310197839-ccf54634509e?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60"
+            },
+            {
+                name: "أسود",
+                image: "https://images.unsplash.com/photo-1533867617858-e7b97e060509?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60"
+            }
+        ],
         sizes: ["40", "41", "42", "43", "44"],
         inStock: true
     },
@@ -114,7 +205,20 @@ let products = [
         oldPrice: 159.99,
         image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60",
         description: "نظارة شمسية بتصميم عصري، توفر حماية كاملة من أشعة الشمس الضارة.",
-        colors: ["أسود", "بني", "أزرق"],
+        colors: [
+            {
+                name: "أسود",
+                image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60"
+            },
+            {
+                name: "بني",
+                image: "https://images.unsplash.com/photo-1577803645773-f96470509666?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60"
+            },
+            {
+                name: "أزرق",
+                image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60"
+            }
+        ],
         sizes: ["واحد"],
         inStock: true,
         badge: "الأكثر مبيعاً"
@@ -270,7 +374,7 @@ function addToCart(productId, quantity) {
     
     // الحصول على المقاس واللون المحددين (إذا كانت متاحة)
     let selectedSize = product.sizes[0];
-    let selectedColor = product.colors[0];
+    let selectedColor = product.colors[0].name;
     
     // التحقق من وجود قائمة المقاسات والألوان في النافذة المنبثقة
     const sizeSelect = document.getElementById('product-size');
@@ -328,15 +432,20 @@ function showProductDetails(productId) {
         sizesHTML += `<option value="${size}">${size}</option>`;
     });
     
+    // إنشاء عناصر الألوان المرئية بدلاً من القائمة المنسدلة
     let colorsHTML = '';
-    product.colors.forEach(color => {
-        colorsHTML += `<option value="${color}">${color}</option>`;
+    product.colors.forEach((colorObj, index) => {
+        // تحديد اللون الأول كلون افتراضي مختار
+        const isSelected = index === 0 ? 'selected' : '';
+        colorsHTML += `<div class="color-option ${isSelected}" data-color="${colorObj.name}" data-image="${colorObj.image}" title="${colorObj.name}">
+            <span class="color-name">${colorObj.name}</span>
+        </div>`;
     });
     
     productDetails.innerHTML = `
         <div class="product-details-container">
             <div class="product-details-image">
-                <img src="${product.image}" alt="${product.title}">
+                <img id="product-main-image" src="${product.colors[0].image}" alt="${product.title}">
                 ${product.badge ? `<span class="product-badge">${product.badge}</span>` : ''}
             </div>
             <div class="product-details-info">
@@ -349,12 +458,13 @@ function showProductDetails(productId) {
                 <p class="product-details-description">${product.description}</p>
                 <div class="product-details-meta">
                     <p><span>الحالة:</span> ${product.inStock ? 'متوفر' : 'غير متوفر'}</p>
-                    <p>
-                        <span>اللون:</span>
-                        <select id="product-color">
+                    <div>
+                        <p><span>اللون:</span> <span id="selected-color-name">${product.colors[0]}</span></p>
+                        <div class="color-options-container">
                             ${colorsHTML}
-                        </select>
-                    </p>
+                        </div>
+                        <input type="hidden" id="product-color" value="${product.colors[0]}">
+                    </div>
                     <p>
                         <span>المقاس:</span>
                         <select id="product-size">
@@ -378,6 +488,33 @@ function showProductDetails(productId) {
             </div>
         </div>
     `;
+    
+    // إضافة مستمعي الأحداث لخيارات الألوان
+    document.querySelectorAll('.color-option').forEach(colorOption => {
+        colorOption.addEventListener('click', function() {
+            // إزالة الفئة 'selected' من جميع خيارات الألوان
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // إضافة الفئة 'selected' إلى الخيار المحدد
+            this.classList.add('selected');
+            
+            // تحديث اللون المحدد في الحقل المخفي
+            const selectedColor = this.getAttribute('data-color');
+            document.getElementById('product-color').value = selectedColor;
+            
+            // تحديث اسم اللون المعروض
+            document.getElementById('selected-color-name').textContent = selectedColor;
+            
+            // تغيير صورة المنتج بناءً على اللون المحدد
+            const selectedImage = this.getAttribute('data-image');
+            if (selectedImage) {
+                document.getElementById('product-main-image').src = selectedImage;
+            }
+        });
+    });
+
     
     // فتح النافذة المنبثقة
     const productModal = document.getElementById('product-modal');
