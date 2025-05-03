@@ -19,7 +19,9 @@ window.addEventListener('scroll', function() {
 });
 
 // بيانات المنتجات - المصفوفة الافتراضية
+// سيتم تحميل البيانات من Firebase
 let products = [
+    // البيانات الافتراضية ستبقى كما هي حتى يتم تحميل البيانات من Firebase
     {
         id: 1,
         title: "تيشيرت قطني بأكمام قصيرة",
@@ -231,6 +233,37 @@ let currentFilter = 'all';
 
 // تحميل الصفحة
 document.addEventListener('DOMContentLoaded', function() {
+    // تحميل المنتجات من Firebase
+    firebaseDB.getProducts().then(data => {
+        if (data && data.length > 0) {
+            products = data;
+            displayProducts();
+            updateCartCount();
+        }
+    });
+    
+    // الاستماع للتغييرات في المنتجات من Firebase
+    firebaseDB.onProductsChange(data => {
+        if (data && data.length > 0) {
+            products = data;
+            displayProducts();
+            updateCartCount();
+        }
+    });
+    
+    // تحميل أكواد المنتجات من Firebase
+    firebaseDB.getProductCodes().then(data => {
+        if (data) {
+            Object.assign(productCodes, data);
+        }
+    });
+    
+    // الاستماع للتغييرات في أكواد المنتجات من Firebase
+    firebaseDB.onProductCodesChange(data => {
+        if (data) {
+            Object.assign(productCodes, data);
+        }
+    });
     // تحميل المنتجات من localStorage إذا كانت موجودة
     const savedProducts = localStorage.getItem('products');
     if (savedProducts) {
