@@ -159,6 +159,49 @@
             cursor: pointer;
             color: #f44336;
         }
+        
+        .color-images-container {
+            margin-top: 15px;
+            border: 1px solid #eee;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        
+        .color-image-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        
+        .color-name-label {
+            font-weight: bold;
+            margin-left: 10px;
+            min-width: 100px;
+        }
+        
+        .color-image-input {
+            flex-grow: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .color-image-preview {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            margin-right: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .color-image-note {
+            color: #666;
+            font-style: italic;
+        }
 
         .add-item-btn {
             background-color: #2196F3;
@@ -308,6 +351,13 @@
                         <div>
                             <input type="text" id="new-color" placeholder="أضف لون جديد">
                             <button type="button" id="add-color" class="add-item-btn">إضافة</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label>صور المنتج حسب اللون</label>
+                        <div id="color-images-container" class="color-images-container">
+                            <p class="color-image-note">أضف الألوان أولاً ثم أضف صورة لكل لون</p>
                         </div>
                     </div>
                     
