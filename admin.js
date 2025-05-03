@@ -85,7 +85,7 @@ function setupAdminAccess() {
             // طلب كلمة المرور بعد 5 نقرات متتالية
             if (copyrightClickCount >= 5) {
                 const password = prompt('الرجاء إدخال كلمة المرور للوصول إلى لوحة الإدارة:');
-                if (password === '29/5/200/=Jo-Egypt') {
+                if (password === '29/5/2005=Jo-Egypt') {
                     window.location.href = 'admin.html';
                 } else if (password !== null) {
                     alert('كلمة المرور غير صحيحة!');
