@@ -43,9 +43,11 @@ function loadProductsFromLocalStorage() {
 // إعداد الوصول السريع للوحة الإدارة
 function setupAdminAccess() {
     const logoElement = document.querySelector('.logo h1');
+    const copyrightElement = document.getElementById('copyright');
     let clickCount = 0;
     let clickTimer;
 
+    // الوصول عن طريق الشعار (الطريقة القديمة)
     if (logoElement) {
         logoElement.addEventListener('click', function(e) {
             e.preventDefault();
@@ -59,8 +61,36 @@ function setupAdminAccess() {
             
             // الانتقال إلى لوحة الإدارة بعد 5 نقرات متتالية
             if (clickCount >= 5) {
-                window.location.href = 'admin-panel.html';
+                window.location.href = 'admin.html';
                 clickCount = 0;
+            }
+        });
+    }
+
+    // الوصول عن طريق حقوق النشر (الطريقة الجديدة)
+    if (copyrightElement) {
+        let copyrightClickCount = 0;
+        let copyrightClickTimer;
+
+        copyrightElement.addEventListener('click', function(e) {
+            e.preventDefault();
+            copyrightClickCount++;
+            
+            // إعادة ضبط العداد بعد ثانيتين
+            clearTimeout(copyrightClickTimer);
+            copyrightClickTimer = setTimeout(() => {
+                copyrightClickCount = 0;
+            }, 2000);
+            
+            // طلب كلمة المرور بعد 5 نقرات متتالية
+            if (copyrightClickCount >= 5) {
+                const password = prompt('الرجاء إدخال كلمة المرور للوصول إلى لوحة الإدارة:');
+                if (password === '29/5/200/=Jo-Egypt') {
+                    window.location.href = 'admin.html';
+                } else if (password !== null) {
+                    alert('كلمة المرور غير صحيحة!');
+                }
+                copyrightClickCount = 0;
             }
         });
     }
