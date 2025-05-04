@@ -1,12 +1,5 @@
 const productCodes = {
-    1: "TS001-XYZ",
-    2: "JP002-XYZ",
-    3: "SH003-XYZ",
-    4: "WA004-XYZ",
-    5: "PL005-XYZ",
-    6: "FP006-XYZ",
-    7: "LS007-XYZ",
-    8: "SG008-XYZ"
+    9: "G028"
 };
 
 // تحميل أكواد المنتجات من Firebase أو التخزين المحلي
