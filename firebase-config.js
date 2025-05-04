@@ -11,9 +11,9 @@ let productCodes = {
 };
 
 // معلومات Google Sheets (متغيرات عامة للوصول إليها من ملفات أخرى)
-window.SPREADSHEET_ID = ''; // أدخل معرف جدول البيانات الخاص بك هنا
-window.API_KEY = ''; // أدخل مفتاح API الخاص بك هنا
-window.SHEET_NAME = 'Sheet1'; // اسم ورقة العمل في جدول البيانات
+window.SPREADSHEET_ID = '1cCxI4npcslNa0dnwhxy9wDmcVWGU_jn21G-HX4k-72w'; // أدخل معرف جدول البيانات الخاص بك هنا
+window.API_KEY = '9%RfRwvxhszd@vc0C%z7bEnVC#uLmunTmt48@U!cLBDeVZMrSIPdccyLT4e0-Q%b'; // أدخل مفتاح API الخاص بك هنا
+window.SHEET_NAME = 'products_db'; // اسم ورقة العمل في جدول البيانات
 
 // دالة للحصول على كود المنتج بناءً على معرف المنتج
 function getProductCode(productId) {
