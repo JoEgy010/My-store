@@ -1,4 +1,5 @@
-const productCodes = {
+// تكوين البيانات الأولية للمنتجات
+let productCodes = {
     1: "TS001-XYZ",
     2: "JP002-XYZ",
     3: "SH003-XYZ",
@@ -9,128 +10,10 @@ const productCodes = {
     8: "SG008-XYZ"
 };
 
-// تحميل أكواد المنتجات من Firebase أو التخزين المحلي
-document.addEventListener('DOMContentLoaded', function() {
-    // إضافة مؤشر حالة الاتصال بـ Firebase
-    let firebaseStatus = document.createElement('div');
-    firebaseStatus.id = 'firebase-status';
-    firebaseStatus.style.position = 'fixed';
-    firebaseStatus.style.bottom = '10px';
-    firebaseStatus.style.right = '10px';
-    firebaseStatus.style.padding = '5px 10px';
-    firebaseStatus.style.borderRadius = '5px';
-    firebaseStatus.style.fontSize = '12px';
-    firebaseStatus.style.zIndex = '9999';
-    firebaseStatus.style.display = 'none'; // سيتم إظهاره فقط عند الحاجة
-    document.body.appendChild(firebaseStatus);
-
-    // دالة لتحديث حالة الاتصال
-    function updateConnectionStatus(status, message) {
-        if (!firebaseStatus) return;
-        
-        firebaseStatus.style.display = 'block';
-        if (status === 'connected') {
-            firebaseStatus.style.backgroundColor = '#4CAF50';
-            firebaseStatus.style.color = 'white';
-            firebaseStatus.textContent = 'متصل بـ Firebase: ' + message;
-            // إخفاء الرسالة بعد 3 ثوانٍ
-            setTimeout(() => { firebaseStatus.style.display = 'none'; }, 3000);
-        } else if (status === 'error') {
-            firebaseStatus.style.backgroundColor = '#F44336';
-            firebaseStatus.style.color = 'white';
-            firebaseStatus.textContent = 'خطأ في الاتصال: ' + message;
-        } else if (status === 'offline') {
-            firebaseStatus.style.backgroundColor = '#FF9800';
-            firebaseStatus.style.color = 'white';
-            firebaseStatus.textContent = 'غير متصل بالإنترنت';
-        }
-    }
-
-    // مراقبة حالة الاتصال بالإنترنت
-    window.addEventListener('online', () => {
-        console.log('متصل بالإنترنت');
-        if (typeof firebaseDB !== 'undefined') {
-            // إعادة محاولة الاتصال بـ Firebase
-            loadFromFirebase();
-        }
-    });
-
-    window.addEventListener('offline', () => {
-        console.log('غير متصل بالإنترنت');
-        updateConnectionStatus('offline', '');
-    });
-
-    // دالة لتحميل البيانات من Firebase
-    function loadFromFirebase() {
-        if (!navigator.onLine) {
-            console.warn('غير متصل بالإنترنت. سيتم تحميل البيانات من التخزين المحلي.');
-            updateConnectionStatus('offline', '');
-            loadFromLocalStorage();
-            return;
-        }
-
-        firebaseDB.getProductCodes()
-            .then(data => {
-                if (data) {
-                    // دمج الأكواد المحفوظة مع الأكواد الافتراضية
-                    Object.assign(productCodes, data);
-                    updateConnectionStatus('connected', 'تم تحميل البيانات بنجاح');
-                } else {
-                    // إذا لم تكن هناك بيانات في Firebase، حاول التحميل من localStorage
-                    loadFromLocalStorage();
-                    // حفظ البيانات في Firebase للمزامنة
-                    return firebaseDB.saveProductCodes(productCodes)
-                        .then(() => {
-                            updateConnectionStatus('connected', 'تم حفظ البيانات الافتراضية');
-                        });
-                }
-            })
-            .catch(error => {
-                console.error("خطأ في تحميل أكواد المنتجات من Firebase:", error);
-                updateConnectionStatus('error', error.message || 'خطأ غير معروف');
-                // في حالة الخطأ، حاول التحميل من localStorage
-                loadFromLocalStorage();
-            });
-        
-        // الاستماع للتغييرات في أكواد المنتجات من Firebase
-        firebaseDB.onProductCodesChange(data => {
-            if (data) {
-                // تحديث فقط إذا كانت البيانات مختلفة عن البيانات الحالية
-                if (JSON.stringify(productCodes) !== JSON.stringify(data)) {
-                    Object.assign(productCodes, data);
-                    console.log('تم تحديث أكواد المنتجات من Firebase');
-                    updateConnectionStatus('connected', 'تم تحديث البيانات');
-                }
-            }
-        });
-    }
-
-    // تحميل من Firebase إذا كان متاحًا
-    if (typeof firebaseDB !== 'undefined') {
-        loadFromFirebase();
-    } else {
-        // إذا لم يكن Firebase متاحًا، حاول التحميل من localStorage
-        console.warn('Firebase غير متاح. سيتم تحميل البيانات من التخزين المحلي فقط.');
-        updateConnectionStatus('error', 'Firebase غير متاح');
-        loadFromLocalStorage();
-    }
-});
-
-// دالة مساعدة لتحميل البيانات من التخزين المحلي
-function loadFromLocalStorage() {
-    try {
-        if (typeof localStorage !== 'undefined') {
-            const savedCodes = localStorage.getItem('productCodes');
-            if (savedCodes) {
-                const parsedCodes = JSON.parse(savedCodes);
-                // دمج الأكواد المحفوظة مع الأكواد الافتراضية
-                Object.assign(productCodes, parsedCodes);
-            }
-        }
-    } catch (error) {
-        console.warn("تعذر تحميل أكواد المنتجات من التخزين المحلي:", error);
-    }
-}
+// معلومات Google Sheets (متغيرات عامة للوصول إليها من ملفات أخرى)
+window.SPREADSHEET_ID = ''; // أدخل معرف جدول البيانات الخاص بك هنا
+window.API_KEY = ''; // أدخل مفتاح API الخاص بك هنا
+window.SHEET_NAME = 'Sheet1'; // اسم ورقة العمل في جدول البيانات
 
 // دالة للحصول على كود المنتج بناءً على معرف المنتج
 function getProductCode(productId) {
@@ -155,47 +38,19 @@ function updateProductCode(productId, code) {
     // تحديث الكود
     productCodes[productId] = code;
     
-    // حفظ التغييرات في Firebase للمزامنة بين جميع المستخدمين
-    if (typeof firebaseDB !== 'undefined') {
-        // التحقق من حالة الاتصال بالإنترنت
-        if (navigator.onLine) {
-            // استخدام Promise للتأكد من اكتمال عملية الحفظ
-            return firebaseDB.saveProductCodes(productCodes)
-                .then(() => {
-                    console.log("تم حفظ أكواد المنتجات في Firebase بنجاح");
-                    // حفظ في التخزين المحلي كنسخة احتياطية
-                    saveToLocalStorage();
-                    return true;
-                })
-                .catch(error => {
-                    console.error("خطأ في حفظ أكواد المنتجات في Firebase:", error);
-                    // في حالة الخطأ، حفظ في التخزين المحلي على الأقل
-                    saveToLocalStorage();
-                    return false;
-                });
-        } else {
-            console.warn("لا يوجد اتصال بالإنترنت. سيتم حفظ التغييرات محليًا فقط.");
-            // حفظ في التخزين المحلي عند عدم وجود اتصال
-            saveToLocalStorage();
-            return false;
+    // محاولة حفظ التغييرات في التخزين المحلي إذا كان متاحًا
+    try {
+        if (typeof localStorage !== 'undefined') {
+            localStorage.setItem('productCodes', JSON.stringify(productCodes));
         }
-    } else {
-        // إذا لم يكن Firebase متاحًا، حفظ في التخزين المحلي فقط
-        saveToLocalStorage();
-        return true;
+    } catch (error) {
+        console.warn("تعذر حفظ التغييرات في التخزين المحلي:", error);
     }
     
-    // دالة مساعدة لحفظ البيانات في التخزين المحلي
-    function saveToLocalStorage() {
-        try {
-            if (typeof localStorage !== 'undefined') {
-                localStorage.setItem('productCodes', JSON.stringify(productCodes));
-                console.log("تم حفظ أكواد المنتجات في التخزين المحلي");
-            }
-        } catch (error) {
-            console.warn("تعذر حفظ التغييرات في التخزين المحلي:", error);
-        }
-    }
+    // حفظ التغييرات في Google Sheets
+    saveToGoogleSheets();
+    
+    return true;
 }
 
 // دالة لحذف كود منتج
@@ -203,47 +58,162 @@ function deleteProductCode(productId) {
     if (productCodes.hasOwnProperty(productId)) {
         delete productCodes[productId];
         
-        // حفظ التغييرات في Firebase للمزامنة بين جميع المستخدمين
-        if (typeof firebaseDB !== 'undefined') {
-            // التحقق من حالة الاتصال بالإنترنت
-            if (navigator.onLine) {
-                // استخدام Promise للتأكد من اكتمال عملية الحفظ
-                return firebaseDB.saveProductCodes(productCodes)
-                    .then(() => {
-                        console.log("تم حذف وحفظ أكواد المنتجات في Firebase بنجاح");
-                        // حفظ في التخزين المحلي كنسخة احتياطية
-                        saveToLocalStorage();
-                        return true;
-                    })
-                    .catch(error => {
-                        console.error("خطأ في حفظ أكواد المنتجات في Firebase بعد الحذف:", error);
-                        // في حالة الخطأ، حفظ في التخزين المحلي على الأقل
-                        saveToLocalStorage();
-                        return false;
-                    });
-            } else {
-                console.warn("لا يوجد اتصال بالإنترنت. سيتم حفظ التغييرات محليًا فقط.");
-                // حفظ في التخزين المحلي عند عدم وجود اتصال
-                saveToLocalStorage();
-                return true;
+        // حفظ التغييرات في التخزين المحلي
+        try {
+            if (typeof localStorage !== 'undefined') {
+                localStorage.setItem('productCodes', JSON.stringify(productCodes));
             }
-        } else {
-            // إذا لم يكن Firebase متاحًا، حفظ في التخزين المحلي فقط
-            saveToLocalStorage();
-            return true;
+        } catch (error) {
+            console.warn("تعذر حفظ التغييرات في التخزين المحلي:", error);
         }
         
-        // دالة مساعدة لحفظ البيانات في التخزين المحلي
-        function saveToLocalStorage() {
-            try {
-                if (typeof localStorage !== 'undefined') {
-                    localStorage.setItem('productCodes', JSON.stringify(productCodes));
-                    console.log("تم حفظ أكواد المنتجات في التخزين المحلي بعد الحذف");
-                }
-            } catch (error) {
-                console.warn("تعذر حفظ التغييرات في التخزين المحلي بعد الحذف:", error);
-            }
-        }
+        // حفظ التغييرات في Google Sheets
+        saveToGoogleSheets();
+        
+        return true;
     }
     return false;
+}
+
+// دالة لتحميل البيانات من Google Sheets
+function loadFromGoogleSheets() {
+    // التحقق من توفر معرف جدول البيانات ومفتاح API
+    if (!window.SPREADSHEET_ID || !window.API_KEY) {
+        console.error("خطأ: يجب توفير معرف جدول البيانات ومفتاح API");
+        return;
+    }
+    
+    // بناء رابط API لجلب البيانات
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${window.SPREADSHEET_ID}/values/${window.SHEET_NAME}?key=${window.API_KEY}`;
+    
+    // إظهار رسالة تحميل
+    console.log("جاري تحميل البيانات من Google Sheets...");
+    
+    // استخدام Fetch API لجلب البيانات
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`خطأ في الاستجابة: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            // التحقق من وجود بيانات
+            if (data && data.values && data.values.length > 1) {
+                // إعادة تعيين كائن رموز المنتجات
+                productCodes = {};
+                
+                // تجاهل الصف الأول (العناوين) وتحويل البيانات
+                for (let i = 1; i < data.values.length; i++) {
+                    const row = data.values[i];
+                    if (row.length >= 2) {
+                        const productId = row[0];
+                        const productCode = row[1];
+                        productCodes[productId] = productCode;
+                    }
+                }
+                
+                console.log("تم تحميل البيانات بنجاح من Google Sheets");
+                
+                // تحديث التخزين المحلي بالبيانات الجديدة
+                try {
+                    if (typeof localStorage !== 'undefined') {
+                        localStorage.setItem('productCodes', JSON.stringify(productCodes));
+                    }
+                } catch (error) {
+                    console.warn("تعذر حفظ التغييرات في التخزين المحلي:", error);
+                }
+                
+                // إطلاق حدث لإعلام التطبيق بتحديث البيانات
+                const event = new CustomEvent('productCodesUpdated');
+                document.dispatchEvent(event);
+            } else {
+                console.warn("لم يتم العثور على بيانات في جدول البيانات");
+            }
+        })
+        .catch(error => {
+            console.error("خطأ في تحميل البيانات من Google Sheets:", error);
+        });
+}
+
+// دالة لحفظ البيانات في Google Sheets
+function saveToGoogleSheets() {
+    // التحقق من توفر معرف جدول البيانات ومفتاح API
+    if (!window.SPREADSHEET_ID || !window.API_KEY) {
+        console.error("خطأ: يجب توفير معرف جدول البيانات ومفتاح API");
+        return;
+    }
+    
+    // تحويل كائن رموز المنتجات إلى مصفوفة لإرسالها إلى Google Sheets
+    const values = [
+        ["معرف المنتج", "رمز المنتج"] // صف العناوين
+    ];
+    
+    // إضافة البيانات
+    for (const productId in productCodes) {
+        if (productCodes.hasOwnProperty(productId)) {
+            values.push([productId, productCodes[productId]]);
+        }
+    }
+    
+    // بناء رابط API لتحديث البيانات
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${window.SPREADSHEET_ID}/values/${window.SHEET_NAME}?valueInputOption=RAW&key=${window.API_KEY}`;
+    
+    // إعداد بيانات الطلب
+    const requestData = {
+        range: window.SHEET_NAME,
+        majorDimension: "ROWS",
+        values: values
+    };
+    
+    // إرسال طلب PUT لتحديث البيانات
+    fetch(url, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`خطأ في الاستجابة: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("تم حفظ البيانات بنجاح في Google Sheets");
+    })
+    .catch(error => {
+        console.error("خطأ في حفظ البيانات في Google Sheets:", error);
+    });
+}
+
+// دالة لتهيئة الاتصال بـ Google Sheets
+function initGoogleSheets() {
+    // التحقق من توفر معرف جدول البيانات ومفتاح API
+    if (!window.SPREADSHEET_ID || !window.API_KEY) {
+        console.warn("تنبيه: لم يتم تكوين معرف جدول البيانات أو مفتاح API");
+        return;
+    }
+    
+    // محاولة تحميل البيانات من التخزين المحلي أولاً
+    try {
+        if (typeof localStorage !== 'undefined') {
+            const storedData = localStorage.getItem('productCodes');
+            if (storedData) {
+                productCodes = JSON.parse(storedData);
+                console.log("تم تحميل البيانات من التخزين المحلي");
+            }
+        }
+    } catch (error) {
+        console.warn("تعذر تحميل البيانات من التخزين المحلي:", error);
+    }
+    
+    // تحميل البيانات من Google Sheets
+    loadFromGoogleSheets();
+}
+
+// تشغيل وظيفة التهيئة عند تحميل الصفحة
+if (typeof window !== 'undefined') {
+    window.addEventListener('DOMContentLoaded', initGoogleSheets);
 }
