@@ -18,68 +18,38 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // إعداد أحداث النماذج
     setupFormEvents();
+    
+    // إعداد وظائف قاعدة البيانات
+    setupDatabaseFunctions();
+    
+    // تحديث معلومات قاعدة البيانات
+    updateDatabaseInfo();
 
     // الوصول السريع للوحة الإدارة من الصفحة الرئيسية
     setupAdminAccess();
 });
 
-// حفظ المنتجات في Firebase
+// حفظ المنتجات في localStorage
 function saveProductsToLocalStorage() {
-    // حفظ في localStorage للتوافق مع الكود القديم
     localStorage.setItem('products', JSON.stringify(products));
-    // حفظ في Firebase للمزامنة بين جميع المستخدمين
-    firebaseDB.saveProducts(products);
+    
+    // إطلاق حدث لإعلام التطبيق بتحديث البيانات
+    const event = new CustomEvent('productDataChanged', {
+        detail: { source: 'admin', timestamp: new Date().toISOString() }
+    });
+    document.dispatchEvent(event);
 }
 
-// تحميل المنتجات من Firebase
+// تحميل المنتجات من localStorage
 function loadProductsFromLocalStorage() {
-    // محاولة تحميل من Firebase أولاً
-    firebaseDB.getProducts().then(data => {
-        if (data && data.length > 0) {
-            // تحديث مصفوفة المنتجات العالمية بالبيانات المحفوظة
-            // استبدال المنتجات الموجودة بالمنتجات المحفوظة
-            products.length = 0; // تفريغ المصفوفة
-            data.forEach(product => products.push(product));
-            // عرض المنتجات المحدثة
-            displayProducts();
-        } else {
-            // إذا لم تكن هناك بيانات في Firebase، حاول التحميل من localStorage
-            const savedProducts = localStorage.getItem('products');
-            if (savedProducts) {
-                // تحديث مصفوفة المنتجات العالمية بالبيانات المحفوظة
-                const parsedProducts = JSON.parse(savedProducts);
-                // استبدال المنتجات الموجودة بالمنتجات المحفوظة
-                products.length = 0; // تفريغ المصفوفة
-                parsedProducts.forEach(product => products.push(product));
-                // حفظ البيانات في Firebase للمزامنة
-                firebaseDB.saveProducts(products);
-            }
-        }
-    }).catch(error => {
-        console.error("خطأ في تحميل البيانات من Firebase:", error);
-        // في حالة الخطأ، حاول التحميل من localStorage
-        const savedProducts = localStorage.getItem('products');
-        if (savedProducts) {
-            // تحديث مصفوفة المنتجات العالمية بالبيانات المحفوظة
-            const parsedProducts = JSON.parse(savedProducts);
-            // استبدال المنتجات الموجودة بالمنتجات المحفوظة
-            products.length = 0; // تفريغ المصفوفة
-            parsedProducts.forEach(product => products.push(product));
-        }
-    });
-    
-    // الاستماع للتغييرات في المنتجات من Firebase
-    firebaseDB.onProductsChange(data => {
-        if (data && data.length > 0) {
-            // تحديث فقط إذا كانت البيانات مختلفة عن البيانات الحالية
-            if (JSON.stringify(products) !== JSON.stringify(data)) {
-                products.length = 0; // تفريغ المصفوفة
-                data.forEach(product => products.push(product));
-                // عرض المنتجات المحدثة
-                displayProducts();
-            }
-        }
-    });
+    const savedProducts = localStorage.getItem('products');
+    if (savedProducts) {
+        // تحديث مصفوفة المنتجات العالمية بالبيانات المحفوظة
+        const parsedProducts = JSON.parse(savedProducts);
+        // استبدال المنتجات الموجودة بالمنتجات المحفوظة
+        products.length = 0; // تفريغ المصفوفة
+        parsedProducts.forEach(product => products.push(product));
+    }
 }
 
 // إعداد الوصول السريع للوحة الإدارة
@@ -153,6 +123,11 @@ function setupTabs() {
             this.classList.add('active');
             const tabId = this.getAttribute('data-tab');
             document.getElementById(tabId).classList.add('active');
+            
+            // إذا كانت علامة التبويب هي قاعدة البيانات، قم بتحديث معلومات قاعدة البيانات
+            if (tabId === 'database') {
+                updateDatabaseInfo();
+            }
         });
     });
 }
@@ -236,6 +211,177 @@ function displayProductCodes() {
             deleteProductCode(codeId);
         });
     });
+}
+
+// تحديث معلومات قاعدة البيانات
+function updateDatabaseInfo() {
+    // عرض رابط SheetBest API
+    const apiUrlDisplay = document.getElementById('apiUrlDisplay');
+    if (apiUrlDisplay) {
+        apiUrlDisplay.textContent = window.SHEETBEST_API_URL || 'غير متوفر';
+    }
+    
+    // تحديث عدد المنتجات المسجلة
+    const productsCount = document.getElementById('productsCount');
+    if (productsCount && typeof productCodes === 'object') {
+        productsCount.textContent = Object.keys(productCodes).length;
+    }
+    
+    // تحديث وقت آخر تحديث
+    const lastUpdate = document.getElementById('lastUpdate');
+    if (lastUpdate) {
+        const lastUpdateTime = localStorage.getItem('lastSheetBestUpdate');
+        if (lastUpdateTime) {
+            const date = new Date(lastUpdateTime);
+            lastUpdate.textContent = date.toLocaleString('ar-EG');
+        } else {
+            lastUpdate.textContent = 'لم يتم التحديث بعد';
+        }
+    }
+}
+
+// إعداد وظائف قاعدة البيانات
+function setupDatabaseFunctions() {
+    // أزرار قاعدة البيانات
+    const syncDataBtn = document.getElementById('syncData');
+    const loadDataBtn = document.getElementById('loadData');
+    const saveDataBtn = document.getElementById('saveData');
+    const syncStatus = document.getElementById('sync-status');
+    
+    // التحقق من وجود الأزرار
+    if (!syncDataBtn || !loadDataBtn || !saveDataBtn) {
+        return;
+    }
+    
+    // مزامنة البيانات (تحميل ثم حفظ)
+    syncDataBtn.addEventListener('click', function() {
+        showSyncStatus('جاري مزامنة البيانات...', 'info');
+        
+        // التحقق من توفر دالة loadFromSheetBest
+        if (typeof loadFromSheetBest === 'function') {
+            // تحميل البيانات أولاً
+            fetch(window.SHEETBEST_API_URL)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`خطأ في الاستجابة: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // تحديث البيانات المحلية
+                    if (data && data.length > 0) {
+                        productCodes = {};
+                        for (let i = 0; i < data.length; i++) {
+                            const row = data[i];
+                            if (row["معرف المنتج"] && row["رمز المنتج"]) {
+                                const productId = row["معرف المنتج"];
+                                const productCode = row["رمز المنتج"];
+                                productCodes[productId] = productCode;
+                            }
+                        }
+                        
+                        // حفظ في التخزين المحلي
+                        localStorage.setItem('productCodes', JSON.stringify(productCodes));
+                        
+                        // تحديث واجهة المستخدم
+                        displayProductCodes();
+                        updateDatabaseInfo();
+                        
+                        // حفظ البيانات مرة أخرى في SheetBest
+                        saveToSheetBest();
+                        
+                        // تحديث وقت آخر تحديث
+                        localStorage.setItem('lastSheetBestUpdate', new Date().toISOString());
+                        
+                        // إظهار رسالة نجاح
+                        showSyncStatus('تمت مزامنة البيانات بنجاح', 'success');
+                        
+                        // إطلاق حدث لإعلام التطبيق بتحديث البيانات
+                        const event = new CustomEvent('productCodesUpdated');
+                        document.dispatchEvent(event);
+                    } else {
+                        showSyncStatus('لم يتم العثور على بيانات في جدول البيانات', 'warning');
+                    }
+                })
+                .catch(error => {
+                    showSyncStatus(`خطأ في مزامنة البيانات: ${error.message}`, 'error');
+                });
+        } else {
+            showSyncStatus('خطأ: دالة loadFromSheetBest غير متوفرة', 'error');
+        }
+    });
+    
+    // تحميل البيانات من SheetBest
+    loadDataBtn.addEventListener('click', function() {
+        showSyncStatus('جاري تحميل البيانات من SheetBest...', 'info');
+        
+        // التحقق من توفر دالة loadFromSheetBest
+        if (typeof loadFromSheetBest === 'function') {
+            loadFromSheetBest();
+            
+            // تحديث وقت آخر تحديث
+            localStorage.setItem('lastSheetBestUpdate', new Date().toISOString());
+            
+            // تحديث واجهة المستخدم بعد فترة قصيرة
+            setTimeout(() => {
+                displayProductCodes();
+                updateDatabaseInfo();
+                showSyncStatus('تم تحميل البيانات بنجاح من SheetBest', 'success');
+            }, 1000);
+        } else {
+            showSyncStatus('خطأ: دالة loadFromSheetBest غير متوفرة', 'error');
+        }
+    });
+    
+    // حفظ البيانات في SheetBest
+    saveDataBtn.addEventListener('click', function() {
+        showSyncStatus('جاري حفظ البيانات في SheetBest...', 'info');
+        
+        // التحقق من توفر دالة saveToSheetBest
+        if (typeof saveToSheetBest === 'function') {
+            saveToSheetBest();
+            
+            // تحديث وقت آخر تحديث
+            localStorage.setItem('lastSheetBestUpdate', new Date().toISOString());
+            
+            // تحديث واجهة المستخدم بعد فترة قصيرة
+            setTimeout(() => {
+                updateDatabaseInfo();
+                showSyncStatus('تم حفظ البيانات بنجاح في SheetBest', 'success');
+            }, 1000);
+        } else {
+            showSyncStatus('خطأ: دالة saveToSheetBest غير متوفرة', 'error');
+        }
+    });
+    
+    // دالة لعرض رسائل حالة المزامنة
+    function showSyncStatus(message, type) {
+        if (!syncStatus) return;
+        
+        syncStatus.textContent = message;
+        syncStatus.className = 'notification';
+        
+        if (type === 'success') {
+            syncStatus.classList.add('success');
+        } else if (type === 'error') {
+            syncStatus.classList.add('error');
+        } else if (type === 'warning') {
+            syncStatus.style.backgroundColor = '#fff3cd';
+            syncStatus.style.color = '#856404';
+            syncStatus.style.border = '1px solid #ffeeba';
+        } else if (type === 'info') {
+            syncStatus.style.backgroundColor = '#d1ecf1';
+            syncStatus.style.color = '#0c5460';
+            syncStatus.style.border = '1px solid #bee5eb';
+        }
+        
+        syncStatus.style.display = 'block';
+        
+        // إخفاء الرسالة بعد 5 ثوانٍ
+        setTimeout(function() {
+            syncStatus.style.display = 'none';
+        }, 5000);
+    }
 }
 
 // إعداد أحداث النماذج
