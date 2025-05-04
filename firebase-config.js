@@ -1,17 +1,10 @@
 // تكوين البيانات الأولية للمنتجات
 let productCodes = {
-    1: "TS001-XYZ",
-    2: "JP002-XYZ",
-    3: "SH003-XYZ",
-    4: "WA004-XYZ",
-    5: "PL005-XYZ",
-    6: "FP006-XYZ",
-    7: "LS007-XYZ",
-    8: "SG008-XYZ"
+    
 };
 
 // معلومات Google Sheets (متغيرات عامة للوصول إليها من ملفات أخرى)
-window.SPREADSHEET_ID = '1cCxI4npcslNa0dnwhxy9wDmcVWGU_jn21G-HX4k-72w'; // أدخل معرف جدول البيانات الخاص بك هنا
+window.SPREADSHEET_ID = '26863760-01bd-42aa-81d1-8fd45397d754'; // أدخل معرف جدول البيانات الخاص بك هنا
 window.API_KEY = '9%RfRwvxhszd@vc0C%z7bEnVC#uLmunTmt48@U!cLBDeVZMrSIPdccyLT4e0-Q%b'; // أدخل مفتاح API الخاص بك هنا
 window.SHEET_NAME = 'products_db'; // اسم ورقة العمل في جدول البيانات
 
