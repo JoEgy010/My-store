@@ -3,12 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- إضافة مكتبة Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <title>لوحة إدارة المتجر</title>
     <link rel="stylesheet" href="styles.css">
     <style>
+        /* أنماط حالة الاتصال بقاعدة البيانات */
+        .api-status {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ccc;
+            margin-left: 8px;
+        }
+        
+        .status-indicator.connected {
+            background-color: #4CAF50;
+        }
+        
+        .status-indicator.disconnected {
+            background-color: #f44336;
+        }
+        
+        .admin-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        
+        /* أنماط قسم قاعدة البيانات */
+        .api-info {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #eee;
+        }
+        
+        .database-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .database-info {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #eee;
+        }
+        
         .admin-container {
             max-width: 1200px;
             margin: 20px auto;
@@ -289,7 +338,13 @@
     <div id="admin-section" class="admin-container" style="display: none;">
         <div class="admin-header">
             <h1>لوحة إدارة المتجر</h1>
-            <button id="logout-btn" class="cancel-btn">تسجيل الخروج</button>
+            <div class="admin-controls">
+                <div class="api-status">
+                    <span id="apiStatusIndicator" class="status-indicator"></span>
+                    <span id="apiStatusText">حالة الاتصال بقاعدة البيانات</span>
+                </div>
+                <button id="logout-btn" class="cancel-btn">تسجيل الخروج</button>
+            </div>
         </div>
 
         <div id="notification" class="notification" style="display: none;"></div>
@@ -297,6 +352,7 @@
         <div class="admin-tabs">
             <button class="admin-tab active" data-tab="products">إدارة المنتجات</button>
             <button class="admin-tab" data-tab="product-codes">أكواد المنتجات</button>
+            <button class="admin-tab" data-tab="database">قاعدة البيانات</button>
         </div>
 
         <div id="products" class="tab-content active">
@@ -443,13 +499,74 @@
                 </tbody>
             </table>
         </div>
+        
+        <!-- قسم إدارة قاعدة البيانات -->
+        <div id="database" class="tab-content">
+            <h2>إدارة قاعدة البيانات</h2>
+            
+            <div class="api-info">
+                <h3>معلومات الاتصال</h3>
+                <p>رابط SheetBest API: <span id="apiUrlDisplay"></span></p>
+                <p>حالة الاتصال: <span id="connectionStatus">متصل</span></p>
+            </div>
+            
+            <div class="database-actions">
+                <button id="syncData" class="submit-btn">مزامنة البيانات</button>
+                <button id="loadData" class="submit-btn">تحميل البيانات من السحابة</button>
+                <button id="saveData" class="submit-btn">حفظ البيانات في السحابة</button>
+            </div>
+            
+            <div id="sync-status" class="notification" style="display: none; margin-top: 20px;"></div>
+            
+            <div class="database-info" style="margin-top: 30px;">
+                <h3>معلومات قاعدة البيانات</h3>
+                <p>عدد المنتجات المسجلة: <span id="productsCount">0</span></p>
+                <p>آخر تحديث: <span id="lastUpdate">لم يتم التحديث بعد</span></p>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>
-    <script src="firebase-config.js"></script>
-    <script src="firebase-connection-check.js"></script>
-    <script src="product-codes.js"></script>
+    <script src="product-codes-updated.js"></script>
     <script src="admin.js"></script>
+    <script>
+        // مستمع للأحداث لتحديث المتجر عند تغيير بيانات المنتج
+        document.addEventListener('DOMContentLoaded', function() {
+            // تهيئة الاتصال بـ SheetBest
+            if (typeof initSheetBest === 'function') {
+                initSheetBest();
+                console.log('تم تهيئة الاتصال بـ SheetBest API');
+                
+                // عرض حالة الاتصال
+                const apiStatusIndicator = document.getElementById('apiStatusIndicator');
+                const apiStatusText = document.getElementById('apiStatusText');
+                if (apiStatusIndicator && apiStatusText) {
+                    apiStatusIndicator.classList.add('connected');
+                    apiStatusText.textContent = 'متصل بقاعدة البيانات';
+                }
+            }
+            
+            // إضافة مستمع للأحداث للتحديثات
+            document.addEventListener('productCodesUpdated', function() {
+                console.log('تم تحديث بيانات المنتج في SheetBest');
+                
+                // إطلاق حدث لإعلام الصفحة الرئيسية بالتغييرات
+                const event = new CustomEvent('productDataChanged', {
+                    detail: { source: 'admin', timestamp: new Date().toISOString() }
+                });
+                document.dispatchEvent(event);
+            });
+        });
+        
+        // مستمع للأحداث لتحديث المتجر عند تغيير بيانات المنتج
+        document.addEventListener('productDataChanged', function(event) {
+            console.log('تم تحديث بيانات المنتج:', event.detail);
+            // تحديث عرض المنتجات في المتجر إذا كانت الصفحة الرئيسية مفتوحة
+            if (typeof updateProductDisplay === 'function') {
+                updateProductDisplay();
+            }
+        });
+    </script>
     <script>
         // بيانات تسجيل الدخول (في الإنتاج يجب أن تكون في الخادم)
         const adminCredentials = {
