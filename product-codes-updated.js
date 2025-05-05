@@ -10,9 +10,6 @@ let productCodes = {
     8: "SG008-XYZ"
 };
 
-// رابط SheetBest API
-window.SHEETBEST_API_URL = 'https://api.sheetbest.com/sheets/26863760-01bd-42aa-81d1-8fd45397d754';
-
 // دالة للحصول على كود المنتج بناءً على معرف المنتج
 function getProductCode(productId) {
     return productCodes[productId] || `UNKNOWN-${productId}`;
@@ -45,9 +42,6 @@ function updateProductCode(productId, code) {
         console.warn("تعذر حفظ التغييرات في التخزين المحلي:", error);
     }
     
-    // حفظ التغييرات في SheetBest
-    saveToSheetBest();
-    
     // إطلاق حدث لإعلام التطبيق بتحديث البيانات
     const event = new CustomEvent('productCodesUpdated');
     document.dispatchEvent(event);
@@ -75,9 +69,6 @@ function deleteProductCode(productId) {
             console.warn("تعذر حفظ التغييرات في التخزين المحلي:", error);
         }
         
-        // حفظ التغييرات في SheetBest
-        saveToSheetBest();
-        
         // إطلاق حدث لإعلام التطبيق بتحديث البيانات
         const event = new CustomEvent('productCodesUpdated');
         document.dispatchEvent(event);
@@ -93,172 +84,62 @@ function deleteProductCode(productId) {
     return false;
 }
 
-// دالة لتحميل البيانات من SheetBest
-function loadFromSheetBest() {
-    // التحقق من توفر رابط SheetBest API
-    if (!window.SHEETBEST_API_URL) {
-        console.error("خطأ: رابط SheetBest API غير متوفر");
-        return;
-    }
-    
-    // إظهار رسالة تحميل
-    console.log("جاري تحميل البيانات من SheetBest...");
-    
-    // استخدام Fetch API لجلب البيانات
-    fetch(window.SHEETBEST_API_URL)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`خطأ في الاستجابة: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            // التحقق من وجود بيانات
-            if (data && data.length > 0) {
-                // إعادة تعيين كائن رموز المنتجات
-                productCodes = {};
-                
-                // تحويل البيانات
-                for (let i = 0; i < data.length; i++) {
-                    const row = data[i];
-                    if (row["معرف المنتج"] && row["رمز المنتج"]) {
-                        const productId = row["معرف المنتج"];
-                        const productCode = row["رمز المنتج"];
-                        productCodes[productId] = productCode;
-                    }
-                }
-                
-                console.log("تم تحميل البيانات بنجاح من SheetBest");
-                
-                // تحديث التخزين المحلي بالبيانات الجديدة
-                try {
-                    if (typeof localStorage !== 'undefined') {
-                        localStorage.setItem('productCodes', JSON.stringify(productCodes));
-                        // تحديث وقت آخر تحديث
-                        localStorage.setItem('lastSheetBestUpdate', new Date().toISOString());
-                    }
-                } catch (error) {
-                    console.warn("تعذر حفظ التغييرات في التخزين المحلي:", error);
-                }
-                
-                // إطلاق حدث لإعلام التطبيق بتحديث البيانات
-                const event = new CustomEvent('productCodesUpdated');
-                document.dispatchEvent(event);
-                
-                // إطلاق حدث لإعلام الصفحة الرئيسية بالتغييرات
-                const storeEvent = new CustomEvent('productDataChanged', {
-                    detail: { source: 'productCodes', timestamp: new Date().toISOString() }
-                });
-                document.dispatchEvent(storeEvent);
-            } else {
-                console.warn("لم يتم العثور على بيانات في جدول البيانات");
-            }
-        })
-        .catch(error => {
-            console.error("خطأ في تحميل البيانات من SheetBest:", error);
-        });
-}
-
-// دالة لحفظ البيانات في SheetBest
-function saveToSheetBest() {
-    // التحقق من توفر رابط SheetBest API
-    if (!window.SHEETBEST_API_URL) {
-        console.error("خطأ: رابط SheetBest API غير متوفر");
-        return;
-    }
-    
-    // تحويل كائن رموز المنتجات إلى مصفوفة لإرسالها إلى SheetBest
-    const data = [];
-    
-    // إضافة البيانات
-    for (const productId in productCodes) {
-        if (productCodes.hasOwnProperty(productId)) {
-            data.push({
-                "معرف المنتج": productId,
-                "رمز المنتج": productCodes[productId]
-            });
-        }
-    }
-    
-    // حذف جميع البيانات الموجودة أولاً ثم إضافة البيانات الجديدة
-    // استخدام طريقة DELETE لحذف جميع البيانات
-    fetch(window.SHEETBEST_API_URL, {
-        method: 'DELETE'
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`خطأ في حذف البيانات: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(() => {
-        // بعد حذف البيانات، إضافة البيانات الجديدة
-        return fetch(window.SHEETBEST_API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`خطأ في إضافة البيانات: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(() => {
-        console.log("تم حفظ البيانات بنجاح في SheetBest");
-        
-        // تحديث وقت آخر تحديث
-        try {
-            if (typeof localStorage !== 'undefined') {
-                localStorage.setItem('lastSheetBestUpdate', new Date().toISOString());
-            }
-        } catch (error) {
-            console.warn("تعذر حفظ وقت التحديث في التخزين المحلي:", error);
-        }
-        
-        // إطلاق حدث لإعلام التطبيق بتحديث البيانات
-        const event = new CustomEvent('productCodesUpdated');
-        document.dispatchEvent(event);
-    })
-    .catch(error => {
-        console.error("خطأ في حفظ البيانات في SheetBest:", error);
-    });
-}
-
-// دالة لتهيئة الاتصال بـ SheetBest
-function initSheetBest() {
-    // محاولة تحميل البيانات من التخزين المحلي أولاً
+// دالة لتحميل البيانات من التخزين المحلي
+function loadFromLocalStorage() {
     try {
-        if (typeof localStorage !== 'undefined') {
-            const savedCodes = localStorage.getItem('productCodes');
-            if (savedCodes) {
-                productCodes = JSON.parse(savedCodes);
-                console.log("تم تحميل البيانات من التخزين المحلي");
-                
-                // إطلاق حدث لإعلام التطبيق بتحديث البيانات
-                const event = new CustomEvent('productCodesUpdated');
-                document.dispatchEvent(event);
-            }
+        const savedCodes = localStorage.getItem('productCodes');
+        if (savedCodes) {
+            productCodes = JSON.parse(savedCodes);
+            console.log("تم تحميل البيانات من التخزين المحلي");
+            
+            // إطلاق حدث لإعلام التطبيق بتحديث البيانات
+            const event = new CustomEvent('productCodesUpdated');
+            document.dispatchEvent(event);
+            
+            return true;
         }
     } catch (error) {
-        console.warn("تعذر تحميل البيانات من التخزين المحلي:", error);
+        console.error("خطأ في تحميل البيانات من التخزين المحلي:", error);
     }
-    
-    // تحميل البيانات من SheetBest
-    loadFromSheetBest();
+    return false;
 }
 
-// تهيئة الاتصال عند تحميل الصفحة
+// تحميل البيانات من التخزين المحلي عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', function() {
-    initSheetBest();
+    loadFromLocalStorage();
 });
 
-// تعريف دالة لتحرير المنتج (تستخدم في واجهة المستخدم)
-function editProduct(productId, productCode) {
-    // ملء حقول النموذج بالقيم الحالية
-    document.getElementById('productId').value = productId;
-    document.getElementById('productCode').value = productCode;
+// دالة مساعدة لعرض الإشعارات
+function showNotification(message, type) {
+    // التحقق من وجود عنصر الإشعارات
+    let notificationElement = document.getElementById('notification');
+    
+    // إنشاء عنصر الإشعارات إذا لم يكن موجودًا
+    if (!notificationElement) {
+        notificationElement = document.createElement('div');
+        notificationElement.id = 'notification';
+        document.body.appendChild(notificationElement);
+    }
+    
+    // تعيين نص الإشعار ونوعه
+    notificationElement.textContent = message;
+    notificationElement.className = 'notification';
+    
+    if (type === 'success') {
+        notificationElement.classList.add('success');
+    } else if (type === 'error') {
+        notificationElement.classList.add('error');
+    } else if (type === 'warning') {
+        notificationElement.classList.add('warning');
+    } else if (type === 'info') {
+        notificationElement.classList.add('info');
+    }
+    
+    // عرض الإشعار
+    notificationElement.style.display = 'block';
+    
+    // إخفاء الإشعار بعد 3 ثوانٍ
+    setTimeout(function() {
+        notificationElement.style.display = 'none';
+    }, 3000);
 }
