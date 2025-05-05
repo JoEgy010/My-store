@@ -1,18 +1,94 @@
 // تكوين البيانات الأولية للمنتجات
 let productCodes = {
-    1: "TS001-XYZ",
-    2: "JP002-XYZ",
-    3: "SH003-XYZ",
-    4: "WA004-XYZ",
-    5: "PL005-XYZ",
-    6: "FP006-XYZ",
-    7: "LS007-XYZ",
-    8: "SG008-XYZ"
+    1: "g120",
+    2: "b250",
+    3: "r310",
+    4: "p430",
+    5: "y520",
+    6: "w610",
+    7: "s710",
+    8: "m810"
+};
+
+// بيانات المنتجات مع الألوان والصور
+let productData = {
+    1: {
+        name: "قميص",
+        colors: {
+            "أزرق": "images/product1-blue.jpg",
+            "أحمر": "images/product1-red.jpg",
+            "أسود": "images/product1-black.jpg"
+        }
+    },
+    2: {
+        name: "بنطلون",
+        colors: {
+            "أسود": "images/product2-black.jpg",
+            "بني": "images/product2-brown.jpg"
+        }
+    },
+    3: {
+        name: "حذاء",
+        colors: {
+            "أسود": "images/product3-black.jpg",
+            "بني": "images/product3-brown.jpg",
+            "أبيض": "images/product3-white.jpg"
+        }
+    }
 };
 
 // دالة للحصول على كود المنتج بناءً على معرف المنتج
 function getProductCode(productId) {
     return productCodes[productId] || `UNKNOWN-${productId}`;
+}
+
+// دالة للحصول على بيانات المنتج بناءً على معرف المنتج
+function getProductData(productId) {
+    return productData[productId] || null;
+}
+
+// دالة للحصول على صورة المنتج بناءً على معرف المنتج واللون
+function getProductImage(productId, color) {
+    const product = getProductData(productId);
+    if (product && product.colors && product.colors[color]) {
+        return product.colors[color];
+    }
+    return null;
+}
+
+// دالة لإضافة أو تحديث بيانات المنتج
+function updateProductData(productId, name, colors) {
+    if (!productId || !name) {
+        console.error("خطأ: يجب توفير معرف المنتج والاسم");
+        return false;
+    }
+    
+    // إنشاء أو تحديث بيانات المنتج
+    if (!productData[productId]) {
+        productData[productId] = { name: name, colors: {} };
+    } else {
+        productData[productId].name = name;
+    }
+    
+    // إضافة الألوان إذا تم توفيرها
+    if (colors) {
+        productData[productId].colors = { ...productData[productId].colors, ...colors };
+    }
+    
+    // محاولة حفظ التغييرات في التخزين المحلي
+    try {
+        if (typeof localStorage !== 'undefined') {
+            localStorage.setItem('productData', JSON.stringify(productData));
+        }
+    } catch (error) {
+        console.warn("تعذر حفظ بيانات المنتج في التخزين المحلي:", error);
+    }
+    
+    // إطلاق حدث لإعلام التطبيق بتحديث البيانات
+    const event = new CustomEvent('productDataUpdated');
+    document.dispatchEvent(event);
+    
+    return true;
 }
 
 // دالة لإضافة أو تحديث كود منتج
@@ -23,14 +99,7 @@ function updateProductCode(productId, code) {
         return false;
     }
     
-    // التحقق من تنسيق الكود (يجب أن يتبع نمط XX000-XYZ)
-    const codePattern = /^[A-Z]{2}\d{3}-[A-Z]{3}$/;
-    if (!codePattern.test(code)) {
-        console.error("خطأ: تنسيق الكود غير صحيح. يجب أن يكون بتنسيق XX000-XYZ");
-        return false;
-    }
-    
-    // تحديث الكود
+    // تحديث الكود (بدون قيود على التنسيق)
     productCodes[productId] = code;
     
     // محاولة حفظ التغييرات في التخزين المحلي إذا كان متاحًا
@@ -87,17 +156,29 @@ function deleteProductCode(productId) {
 // دالة لتحميل البيانات من التخزين المحلي
 function loadFromLocalStorage() {
     try {
+        // تحميل أكواد المنتجات
         const savedCodes = localStorage.getItem('productCodes');
         if (savedCodes) {
             productCodes = JSON.parse(savedCodes);
-            console.log("تم تحميل البيانات من التخزين المحلي");
+            console.log("تم تحميل أكواد المنتجات من التخزين المحلي");
             
             // إطلاق حدث لإعلام التطبيق بتحديث البيانات
             const event = new CustomEvent('productCodesUpdated');
             document.dispatchEvent(event);
-            
-            return true;
         }
+        
+        // تحميل بيانات المنتجات
+        const savedProductData = localStorage.getItem('productData');
+        if (savedProductData) {
+            productData = JSON.parse(savedProductData);
+            console.log("تم تحميل بيانات المنتجات من التخزين المحلي");
+            
+            // إطلاق حدث لإعلام التطبيق بتحديث البيانات
+            const event = new CustomEvent('productDataUpdated');
+            document.dispatchEvent(event);
+        }
+        
+        return true;
     } catch (error) {
         console.error("خطأ في تحميل البيانات من التخزين المحلي:", error);
     }
